@@ -7,6 +7,9 @@ from .models import *
 
 # Create your views here.
 
+def homePage(request):
+    return render(request, 'storeapp/home.html')
+
 def registerPage(request):
     form = UserCreationForm()
 
@@ -25,3 +28,7 @@ def loginPage(request):
 def productListing(request):
     context = {}
     return render(request, 'storeapp/product_listing.html', context)
+
+def productsPage(request):
+    products = Product.objects.all()
+    return render(request, 'storeapp/products.html', {'products': products})

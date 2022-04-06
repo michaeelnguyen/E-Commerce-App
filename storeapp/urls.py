@@ -3,7 +3,10 @@ from . import views
 from storeapp import views as storeapp_views
 
 urlpatterns = [
-    path('', storeapp_views.productListing, name="productListing"),
+    path('', storeapp_views.homePage, name="home"),
     path('register/', storeapp_views.registerPage, name="register"),
     path('login/', storeapp_views.loginPage, name="login"),
+    path('products/', storeapp_views.productsPage, name="products"),
+    path('shop/', storeapp_views.productListing, name="productListing"),
+
 ]
