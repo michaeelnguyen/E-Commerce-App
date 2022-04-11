@@ -32,3 +32,36 @@ def productListing(request):
 def productsPage(request):
     products = Product.objects.all()
     return render(request, 'storeapp/products.html', {'products': products})
+
+def employee_dashboard(request, pk):
+    employee = Employee.objects.get(id=pk)
+    orders = Order.objects.all()
+    products = Product.objects.all()
+
+    customers = Customer.objects.all()
+
+    total_customers = customers.count()
+
+    total_orders = orders.count()
+    delivered = orders.filter(status='Delivered').count()
+    pending = orders.filter(status='Pending').count()
+
+    context = {'employee':employee,'orders':orders, 'products':products, 'customers':customers,
+    'total_orders':total_orders,'delivered':delivered,
+    'pending':pending}
+
+    return render(request, 'storeapp/employee_dashboard.html', context)
+
+def customer_dashboard(request, pk):
+    customer = Customer.objects.get(id=pk)
+    orders = customer.order_set.all()
+
+    total_orders = orders.count()
+    delivered = orders.filter(status='Delivered').count()
+    pending = orders.filter(status='Pending').count()
+
+    context = {'orders':orders, 'customer':customer,
+    'total_orders':total_orders,'delivered':delivered,
+    'pending':pending }
+
+    return render(request, 'storeapp/customer_dashboard.html', context)

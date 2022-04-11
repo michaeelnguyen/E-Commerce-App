@@ -2,12 +2,27 @@ from django.contrib import admin
 
 # Register your models here.
 
-from .models import Customer, Employee, Product, Order, Vendor, Expediter, Material
+from .models import Customer, Employee, Vendor, Expediter, Material, Version, InputItem, Machine 
+from .models import Job, Category, Product, Billing, Shipping, Order, Cart, CartItem
 
 admin.site.register(Customer)
 admin.site.register(Employee)
 admin.site.register(Vendor)
 admin.site.register(Expediter)
-admin.site.register(Product)
-admin.site.register(Order)
+
 admin.site.register(Material)
+admin.site.register(Version)
+admin.site.register(InputItem)
+admin.site.register(Machine)
+#admin.site.register(Quality)
+admin.site.register(Job)
+
+admin.site.register(Category)
+admin.site.register(Product)
+admin.site.register(Billing)
+admin.site.register(Shipping)
+admin.site.register(Order)
+
+admin.site.register(Cart)
+#admin.site.register(OrderQuantity)
+admin.site.register(CartItem)
