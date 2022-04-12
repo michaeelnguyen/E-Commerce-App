@@ -108,11 +108,11 @@ class Command(BaseCommand):
         for _ in range(len(INPUT_ITEMS)):
             i = fake.unique.ecommerce_inputItem()
             InputItem.objects.create(input_Name=i)
-            
+
         for _ in range(len(VENDORS)):
             v = fake.unique.ecommerce_vendor()
             Vendor.objects.create(vendor_name=v)
-
+        
         for _ in range(len(EXPEDITERS)):
             e = fake.unique.ecommerce_expediter()
             Expediter.objects.create(expediter_name=e)
@@ -169,19 +169,22 @@ class Command(BaseCommand):
                 product_Version_Date = p_version_date,
                 product_Design_File = p_design_file,
                 product_Comments = p_comments,
-            )   
+            )
+        
         # InputItems
         for _ in range(numRecords):
            input = fake.ecommerce_inputItem()
            qty = random.randint(1, 500)
            mc = fake.sentence()
+           vid = random.randint(2, len(VENDORS) + 1)
 
            InputItem.objects.create(
                input_Name = input,
                quantity_Per_1000_Units = qty,
+               vendor_id = vid,
                message_Commands = mc,
            )
-
+           
         # Machine
         l = random.sample(range(1,30), 15)
         for _ in range(numRecords):
@@ -318,7 +321,6 @@ class Command(BaseCommand):
                 shipment_Quantity = sqty, 
                 shipment_Weight = swt,
             )
-        '''
         # Orders
         for _ in range(numRecords):
             o_date = fake.past_datetime(start_date='-40d')
@@ -342,7 +344,7 @@ class Command(BaseCommand):
                 subtotal = subt,
                 total = t,
             )
-
+        '''
 
 
             #check_category = Category.objects.all().count()

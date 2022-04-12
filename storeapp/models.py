@@ -109,6 +109,7 @@ class InputItem(models.Model):
     quantity_Per_1000_Units = models.PositiveIntegerField(null=True)
     message_Commands = models.TextField(null=True, blank=True)
 
+    vendor = models.ForeignKey(Vendor, null=True, on_delete=models.SET_NULL)
     date_created = models.DateTimeField(auto_now_add=True, null=True)
     is_active = models.BooleanField(default=True)
 
