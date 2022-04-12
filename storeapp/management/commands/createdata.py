@@ -1,9 +1,8 @@
 import random
-from tkinter import E
 from django.core.management.base import BaseCommand
 from faker import Faker
 from faker.providers import BaseProvider
-from storeapp.models import Category, Customer, Employee, Product, Material, Vendor, Expediter, Version, InputItem
+from storeapp.models import Category, Customer, Employee, Machine, Product, Material, Vendor, Expediter, Version, InputItem, Billing, Shipping, Job, Cart, CartItem
 
 import datetime
 from django.conf import settings
@@ -96,25 +95,26 @@ class Command(BaseCommand):
         # Amount of Fake Records created
         numRecords = 15
         '''
+        for _ in range(len(INPUT_ITEMS)):
+            i = fake.unique.ecommerce_inputItem()
+            InputItem.objects.create(input_Name=i)
+            
+        for _ in range(len(VENDORS)):
+            v = fake.unique.ecommerce_vendor()
+            Vendor.objects.create(vendor_name=v)
+        
+        for _ in range(len(EXPEDITERS)):
+            e = fake.unique.ecommerce_expediter()
+            Expediter.objects.create(expediter_name=e)
+        
         for _ in range(len(CATEGORIES) ):
             c = fake.unique.ecommerce_category()
             Category.objects.create(category_Name=c, slug=c)
         
-        for _ in range(len(VENDORS)):
-            v = fake.unique.ecommerce_vendor()
-            Vendor.objects.create(vendor_Name=v, slug=v)
-        
-        for _ in range(len(EXPEDITERS)):
-            e = fake.unique.ecommerce_expediter()
-            Expediter.objects.create(expediter_Name=e, slug=e)
-        
         for _ in range(len(MATERIAL_TYPES)):
             m = fake.unique.ecommerce_material()
             Material.objects.create(material_Type=m)
-            
-        for _ in range(len(INPUT_ITEMS)):
-            i = fake.unique.ecommerce_inputItem()
-            InputItem.objects.create(input_Name=i, slug=i)
+
         # Customer
         for _ in range(numRecords):
             fn = fake.first_name()
@@ -128,7 +128,11 @@ class Command(BaseCommand):
             z = fake.postcode()
             s = fn + "-" + ln
 
-            Customer.objects.create(
+            b_date = fake.date_time_this_year()
+            cid = random.randint(1,numRecords)
+
+
+            Customer.objects.get_or_create(
                 customer_First_Name = fn,
                 customer_Last_Name = ln,
                 customer_Phone_Number = pn,
@@ -139,8 +143,50 @@ class Command(BaseCommand):
                 state = st,
                 zip = z,
                 slug = s
-                )
-        
+            )      
+
+        # Version
+        for _ in range(numRecords):
+            p_image = fake.file_name(category='image')
+            p_version = round(random.uniform(00.01, 99.99),2)
+            p_version_date = fake.date_time_this_year()
+            p_design_file = fake.file_name(extension='cad')
+            p_comments = fake.paragraph()
+
+            Version.objects.create(
+                product_Image = p_image,
+                product_Version = p_version,
+                product_Version_Date = p_version_date,
+                product_Design_File = p_design_file,
+                product_Comments = p_comments,
+            )   
+        # InputItems
+        for _ in range(numRecords):
+           input = fake.ecommerce_inputItem()
+           qty = random.randint(1, 500)
+           mc = fake.sentence()
+
+           InputItem.objects.create(
+               input_Name = input,
+               quantity_Per_1000_Units = qty,
+               message_Commands = mc,
+           )
+
+        # Machine
+        l = random.sample(range(1,30), 15)
+        for _ in range(numRecords):
+            machine_No = l[_]
+
+            #other = random.choices(INPUT_ITEMS, k=2)
+            #plastic = [INPUT_ITEMS[0]]
+            #plastic.extend(other)
+            print(machine_No)
+
+            Machine.objects.create(
+                machine_Number = machine_No,
+                #inputID = ,
+                
+            )
 
         # Employee
         for _ in range(numRecords):
@@ -161,24 +207,101 @@ class Command(BaseCommand):
                 role = r,
                 slug = s
                 )
-        
-
-        # Version
+    
+        # Job
         for _ in range(numRecords):
-            p_image = fake.file_name(category='image')
-            p_version = round(random.uniform(00.01, 99.99),2)
-            p_version_date = fake.date_time_this_decade()
-            p_design_file = fake.file_name(extension='cad')
-            p_comments = fake.paragraph()
+            st = fake.past_datetime(start_date='-30d')
+            et = fake.past_datetime(start_date='-10d')
+            qc = fake.paragraph()
+            dc = random.randint(50,400)
 
-            Version.objects.create(
-                product_Image = p_image,
-                product_Version = p_version,
-                product_Version_Date = p_version_date,
-                product_Design_File = p_design_file,
-                product_Comments = p_comments,
+            mach_id = random.randint(2, numRecords + 1)
+            eid = random.randint(2, numRecords + 1)
+
+            Job.objects.create(
+                machine_ID_id = mach_id, 
+                employee_id = eid,
+                start_Time = st,
+                end_Time = et,
+                quality_Comments = qc,
+                defect_Count = dc,
+                
             )
-            '''
+
+        # Products
+        for _ in range(numRecords):
+            cid = random.randint(2, len(CATEGORIES) + 1)
+            mid = random.randint(2, len(MATERIAL_TYPES) + 1)
+            vid = random.randint(2, len(VENDORS) + 1)
+            jid = random.randint(2, numRecords + 1)
+
+
+            Product.objects.create(
+                product_Name = fake.ecommerce_product(),
+                product_Description = fake.paragraph(),
+                product_Price = round(random.uniform(0.01, 100),2),
+                height = round(random.uniform(0.1, 100),1),
+                width = round(random.uniform(0.1, 100),1),
+                depth = round(random.uniform(0.1, 100),1),
+
+                category_ID_id = cid,
+                material_ID_id = mid,
+                version_ID_id = vid,
+                job_ID_id = jid,
+            )
+        '''
+        # Cart
+        cust_id = random.randint(2, numRecords + 1)
+        Cart.objects.create(customer_id = cust_id)
+        '''
+        # CartItem
+        for _ in range(1,3):
+            i_qty = random.randint(1,500)
+            pid = random.randint(2, numRecords + 1)
+
+            CartItem.objects.create(
+                #cart_ID = ,
+                product_id_id = pid,
+                item_quantity = i_qty,
+            )
+
+        # Billing
+        for _ in range(numRecords):
+            addr = fake.street_address()
+            c = fake.city()
+            st = fake.administrative_unit()
+            z = fake.postcode()
+            s = fn + "-" + ln
+
+            b_date = fake.past_datetime(start_date='-20d')
+
+            Billing.objects.get_or_create(
+                billing_Address = addr,
+                billing_City = c,
+                billing_State = st,
+                billing_Zip = z,
+                date_Billed = b_date,
+            )
+
+        # Shipping
+        for _ in range(numRecords):
+            addr = fake.street_address()
+            c = fake.city()
+            st = fake.administrative_unit()
+            z = fake.postcode()
+
+            s_date = fake.past_datetime(start_date='-5d')
+
+            Shipping.objects.get_or_create(
+                shipping_Address = addr,
+                shipping_City = c,
+                shipping_State = st,
+                shipping_Zip = z,
+                date_Shipped = s_date,
+            )
+              
+        '''
+        # Orders
 
 
 

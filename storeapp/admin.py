@@ -14,7 +14,6 @@ admin.site.register(Material)
 admin.site.register(Version)
 admin.site.register(InputItem)
 admin.site.register(Machine)
-#admin.site.register(Quality)
 admin.site.register(Job)
 
 admin.site.register(Category)
@@ -24,5 +23,4 @@ admin.site.register(Shipping)
 admin.site.register(Order)
 
 admin.site.register(Cart)
-#admin.site.register(OrderQuantity)
 admin.site.register(CartItem)

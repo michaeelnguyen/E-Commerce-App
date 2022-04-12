@@ -1,8 +1,7 @@
-from turtle import ondrag
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.utils.functional import lazy
-
+from django.utils.text import slugify
 
 
 
@@ -10,69 +9,66 @@ from django.utils.functional import lazy
 # Create your models here.
 
 class Customer(models.Model):
-    customer_First_Name = models.CharField(max_length=30, null=True)
-    customer_Last_Name = models.CharField(max_length=30, null=True)
-    customer_Phone_Number= models.CharField(max_length=30, null=True)
-    customer_Email = models.EmailField(max_length=30, null=True)
-    customer_Password= models.CharField(max_length=30, null=True)
-    street_Address = models.CharField(max_length=30, null=True)
-    city = models.CharField(max_length=30, null=True)
-    state = models.CharField(max_length=30, null=True)
-    zip = models.CharField(max_length=30, null=True)
+    customer_First_Name = models.CharField(max_length=255, null=True)
+    customer_Last_Name = models.CharField(max_length=255, null=True)
+    customer_Phone_Number= models.CharField(max_length=255, null=True)
+    customer_Email = models.EmailField(max_length=255, null=True)
+    customer_Password= models.CharField(max_length=255, null=True)
+    street_Address = models.CharField(max_length=255, null=True)
+    city = models.CharField(max_length=255, null=True)
+    state = models.CharField(max_length=255, null=True)
+    zip = models.CharField(max_length=255, null=True)
 
+    slug = models.SlugField(max_length=255, null=True)
     date_created = models.DateTimeField(auto_now_add=True, null=True)
     is_active = models.BooleanField(default=True)
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.customer_First_Name + " " + self.customer_Last_Name)
+        super(Customer, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.customer_First_Name + " " + self.customer_Last_Name
 
 
 class Employee(models.Model):
-    employee_First_Name = models.CharField(max_length=30, null=True)
-    employee_Last_Name = models.CharField(max_length=30, null=True)
-    employee_Phone_Number= models.CharField(max_length=30, null=True)
-    employee_Email = models.EmailField(max_length=30, null=True)
-    employee_Password= models.CharField(max_length=30, null=True)
-    role = models.CharField(max_length=30, null=True)
+    employee_First_Name = models.CharField(max_length=255, null=True)
+    employee_Last_Name = models.CharField(max_length=255, null=True)
+    employee_Phone_Number= models.CharField(max_length=255, null=True)
+    employee_Email = models.EmailField(max_length=255, null=True)
+    employee_Password= models.CharField(max_length=255, null=True)
+    role = models.CharField(max_length=255, null=True)
 
+    slug = models.SlugField(max_length=255, null=True)
     date_created = models.DateTimeField(auto_now_add=True, null=True)
     is_active = models.BooleanField(default=True)
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.employee_First_Name + " " + self.employee_Last_Name)
+        super(Employee, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.employee_First_Name + " " + self.employee_Last_Name
 
 
 class Vendor(models.Model):
-    VENDORS = (
-        ('Dow Chemical', 'Dow Chemical'),
-        ('ExxonMobil', 'ExxonMobil'),
-        ('Adapt Plastics, Inc', 'Adapt Plastics, Inc'),
-        ('A&S Mold & Die Corp', 'A&S Mold & Die Corp'),
-    )
-    vendor_Name = models.CharField(max_length=30, null=True)
+    vendor_name = models.CharField(max_length=255, null=True)
 
     date_created = models.DateTimeField(auto_now_add=True, null=True)
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        return self.vendor_Name
+        return self.vendor_name
 
 
 class Expediter(models.Model):
-    
-    EXPEDITERS = (
-        ('Amazon', 'Amazon'),
-        ('FedEx', 'FedEx'),
-        ('UPS', 'UPS'),
-        ('OnTrac', 'OnTrac'),
-    )
-    expeditor_Name = models.CharField(max_length=30, null=True)
+    expediter_name = models.CharField(max_length=255, null=True)
 
     date_created = models.DateTimeField(auto_now_add=True, null=True)
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        return self.expeditor_Name
+        return self.expediter_name
 
 
 class Material(models.Model):
@@ -86,7 +82,7 @@ class Material(models.Model):
         ('Acrylonitrile-Butadiene-Stryrene (ABS)', 'Acrylonitrile-Butadiene-Stryrene (ABS)'),
     )
 
-    material_Type = models.CharField(max_length=50, null=True)#, choices=MATERIAL_TYPES)
+    material_Type = models.CharField(max_length=255, null=True)#, choices=MATERIAL_TYPES)
     date_created = models.DateTimeField(auto_now_add=True, null=True)
     is_active = models.BooleanField(default=True)
 
@@ -96,7 +92,7 @@ class Material(models.Model):
 
 class Version(models.Model):
     product_Image = models.ImageField(upload_to='media/storeapp/product_images', null=True, blank=True)
-    product_Version = models.CharField(max_length=10, null=True)
+    product_Version = models.CharField(max_length=255, null=True)
     product_Version_Date = models.DateTimeField(auto_now_add=False, null=True)
     product_Design_File = models.FileField(upload_to='media/storeapp/product_files', null=True)
     product_Comments = models.TextField(null=True, blank=True)
@@ -109,7 +105,7 @@ class Version(models.Model):
 
 
 class InputItem(models.Model):
-    input_Name = models.CharField(max_length=30, null=True)
+    input_Name = models.CharField(max_length=255, null=True)
     quantity_Per_1000_Units = models.PositiveIntegerField(null=True)
     message_Commands = models.TextField(null=True, blank=True)
 
@@ -122,7 +118,11 @@ class InputItem(models.Model):
 
 class Machine(models.Model):
     machine_Number = models.PositiveIntegerField(null=True)
-    input_ID = models.ManyToManyField(InputItem)
+    input_ID = models.ManyToManyField(InputItem, related_name='inputs')
+    #input_ID = models.ForeignKey(InputItem, null=True, on_delete=models.SET_NULL)
+
+    date_created = models.DateTimeField(auto_now_add=True, null=True)
+    is_active = models.BooleanField(default=True)
 
     class Meta:
         ordering = ['machine_Number']
@@ -152,20 +152,25 @@ class Job(models.Model):
 
 
 class Category(models.Model):
-    category_name = models.CharField(max_length=30, null=True)
+    category_Name = models.CharField(max_length=255, null=True)
 
+    slug = models.SlugField(max_length=255, null=True)
     date_created = models.DateTimeField(auto_now_add=True, null=True)
     is_active = models.BooleanField(default=True)
 
     class Meta:
         verbose_name_plural = "Categories"
-
+    
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.category_Name)
+        super(Category, self).save(*args, **kwargs)
+    
     def __str__(self):
-        return self.category_name
+        return self.category_Name
 
 class Product(models.Model):
-    product_Name = models.CharField(max_length=30, null=True)
-    product_Description = models.CharField(max_length=50, null=True)
+    product_Name = models.CharField(max_length=255, null=True)
+    product_Description = models.CharField(max_length=255, null=True)
     product_Price = models.DecimalField(max_digits=12, decimal_places=2, null=True)
     product_Stock = models.BooleanField(default=True)
     
@@ -173,24 +178,24 @@ class Product(models.Model):
     width = models.DecimalField(max_digits=5, decimal_places=2, null=True)
     depth = models.DecimalField(max_digits=5, decimal_places=2, null=True)
 
-    category_ID = models.ForeignKey(Category, null=True, on_delete=models.SET_NULL)
-    material_ID = models.ForeignKey(Material, null=True, on_delete=models.SET_NULL)
-    version_ID = models.ForeignKey(Version, null=True, on_delete=models.SET_NULL)
-    job_ID = models.ForeignKey(Job, null=True, on_delete=models.SET_NULL)
+    category_ID = models.ForeignKey(Category, on_delete=models.RESTRICT)
+    material_ID = models.ForeignKey(Material, null=False, on_delete=models.DO_NOTHING)
+    version_ID = models.ForeignKey(Version, null=False, on_delete=models.DO_NOTHING)
+    job_ID = models.ForeignKey(Job, null=True, on_delete=models.DO_NOTHING)
     
     date_created = models.DateTimeField(auto_now_add=True, null=True)
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        return self.product_Name
+        return f'{self.product_Name} --- DIMENSIONS ({self.height} x {self.width} x {self.width}) --- PRICE ${self.product_Price}'
 
 
 class Billing(models.Model):
-    customer = models.ForeignKey(Customer, null=True, on_delete=models.SET_NULL)
-    billing_Address = models.CharField(max_length=30, null=True)
-    billing_City = models.CharField(max_length=30, null=True)
-    billing_State = models.CharField(max_length=30, null=True)
-    billing_Zip = models.CharField(max_length=30, null=True)
+    #customer = models.ForeignKey(Customer, null=True, on_delete=models.SET_NULL)
+    billing_Address = models.CharField(max_length=255, null=True)
+    billing_City = models.CharField(max_length=255, null=True)
+    billing_State = models.CharField(max_length=255, null=True)
+    billing_Zip = models.CharField(max_length=255, null=True)
     
     date_Billed = models.DateTimeField(auto_now_add=False, null=True, blank=True)
     #card_Number =
@@ -212,11 +217,11 @@ class Billing(models.Model):
 
 
 class Shipping(models.Model):
-    customer = models.ForeignKey(Customer, null=True, on_delete=models.SET_NULL)
-    shipping_Address = models.CharField(max_length=30, null=True)
-    shipping_City = models.CharField(max_length=30, null=True)
-    shipping_State = models.CharField(max_length=30, null=True)
-    shipping_Zip = models.CharField(max_length=30, null=True)
+    #customer = models.ForeignKey(Customer, null=True, on_delete=models.SET_NULL)
+    shipping_Address = models.CharField(max_length=255, null=True)
+    shipping_City = models.CharField(max_length=255, null=True)
+    shipping_State = models.CharField(max_length=255, null=True)
+    shipping_Zip = models.CharField(max_length=255, null=True)
     
     date_Shipped = models.DateTimeField(auto_now_add=False, null=True, blank=True)
 
@@ -277,8 +282,8 @@ class Order(models.Model):
     #order_quantity_ID = models.ForeignKey(OrderQuantity, null=True, on_delete=models.SET_NULL)
 
     order_Date = models.DateTimeField(auto_now_add=True, null=True)
-    order_Status = models.CharField(max_length=20, null=True, choices=STATUS)
-    confirmation_Number = models.CharField(max_length=30, null=True)
+    order_Status = models.CharField(max_length=255, null=True, choices=STATUS)
+    confirmation_Number = models.CharField(max_length=255, null=True)
     billing_ID = models.ForeignKey(Billing, null=True, on_delete=models.SET_NULL)
     shipment_ID = models.ForeignKey(Shipping, null=True, on_delete=models.SET_NULL)
     subtotal = models.DecimalField(max_digits=12, decimal_places=2, null=True)
