@@ -2,7 +2,7 @@ import random
 from django.core.management.base import BaseCommand
 from faker import Faker
 from faker.providers import BaseProvider
-from storeapp.models import Category, Customer, Employee, Machine, Product, Material, Vendor, Expediter, Version, InputItem, Billing, Shipping, Job, Cart, CartItem
+from storeapp.models import Category, Customer, Employee, Machine, Product, Material, Vendor, Expediter, Version, InputItem, Billing, Shipping, Job, Cart, CartItem, Order
 
 import datetime
 from django.conf import settings
@@ -63,6 +63,13 @@ INPUT_ITEMS = [
     "COLOR - BLACK",
 ]
 
+STATUS = [
+    "Pending",
+    "Shipped",
+    "Out for Delivery",
+    "Delivered",
+]
+
     
 
 class Provider(BaseProvider):
@@ -83,6 +90,9 @@ class Provider(BaseProvider):
     
     def ecommerce_inputItem(self):
         return self.random_element(INPUT_ITEMS)
+    
+    def ecommerce_status(self):
+        return self.random_element(STATUS)
 
 class Command(BaseCommand):
     help = "Command Infomation"
@@ -102,11 +112,11 @@ class Command(BaseCommand):
         for _ in range(len(VENDORS)):
             v = fake.unique.ecommerce_vendor()
             Vendor.objects.create(vendor_name=v)
-        
+
         for _ in range(len(EXPEDITERS)):
             e = fake.unique.ecommerce_expediter()
             Expediter.objects.create(expediter_name=e)
-        
+
         for _ in range(len(CATEGORIES) ):
             c = fake.unique.ecommerce_category()
             Category.objects.create(category_Name=c, slug=c)
@@ -249,33 +259,30 @@ class Command(BaseCommand):
                 version_ID_id = vid,
                 job_ID_id = jid,
             )
-        '''
         # Cart
         cust_id = random.randint(2, numRecords + 1)
         Cart.objects.create(customer_id = cust_id)
-        '''
+
         # CartItem
         for _ in range(1,3):
             i_qty = random.randint(1,500)
             pid = random.randint(2, numRecords + 1)
+            cid = 1
 
             CartItem.objects.create(
-                #cart_ID = ,
+                cart_id = cid,
                 product_id_id = pid,
                 item_quantity = i_qty,
             )
-
         # Billing
         for _ in range(numRecords):
             addr = fake.street_address()
             c = fake.city()
             st = fake.administrative_unit()
             z = fake.postcode()
-            s = fn + "-" + ln
+            b_date = fake.past_datetime(start_date='-10d')
 
-            b_date = fake.past_datetime(start_date='-20d')
-
-            Billing.objects.get_or_create(
+            Billing.objects.create(
                 billing_Address = addr,
                 billing_City = c,
                 billing_State = st,
@@ -292,16 +299,49 @@ class Command(BaseCommand):
 
             s_date = fake.past_datetime(start_date='-5d')
 
-            Shipping.objects.get_or_create(
+            eid = random.randint(2, len(EXPEDITERS) + 1)
+            
+            sc = round(random.uniform(4.99, 20),2)
+            sqty = random.randint(1, 30)
+            swt = round(random.uniform(0.01, 500),2)
+
+            Shipping.objects.create(
                 shipping_Address = addr,
                 shipping_City = c,
                 shipping_State = st,
                 shipping_Zip = z,
                 date_Shipped = s_date,
+                
+                expediter_ID_id = eid,
+
+                shipment_Cost = sc,
+                shipment_Quantity = sqty, 
+                shipment_Weight = swt,
             )
-              
         '''
         # Orders
+        for _ in range(numRecords):
+            o_date = fake.past_datetime(start_date='-40d')
+            status = fake.ecommerce_status()
+            c_no = fake.password(length=25, special_chars=False, upper_case=True)
+            subt = round(random.uniform(5.99, 1000),2)
+            t = subt + round(random.uniform(0, 100),2)
+
+            cust_id = random.randint(2, numRecords + 1)
+            bid = random.randint(2, numRecords + 1)
+            sid = random.randint(2, numRecords + 1)
+
+            Order.objects.create(
+                customer_id = cust_id,
+                #cart_id = cid,
+                order_Date = o_date, 
+                order_Status = status,
+                confirmation_Number = c_no, 
+                billing_ID_id = bid,
+                shipment_ID_id = sid,
+                subtotal = subt,
+                total = t,
+            )
 
 
 

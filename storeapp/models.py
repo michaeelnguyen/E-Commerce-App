@@ -227,7 +227,7 @@ class Shipping(models.Model):
 
     expediter_ID = models.ForeignKey(Expediter, null=True, on_delete=models.SET_NULL)
     shipment_Cost = models.DecimalField(max_digits=5, decimal_places=2, null=True)
-    shipment_Quantity = models.DecimalField(max_digits=5, decimal_places=2, null=True)
+    shipment_Quantity = models.PositiveIntegerField(null=True)
     shipment_Weight = models.DecimalField(max_digits=5, decimal_places=2, null=True)
 
     date_created = models.DateTimeField(auto_now_add=True, null=True)
