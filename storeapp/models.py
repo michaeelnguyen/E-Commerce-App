@@ -121,8 +121,8 @@ class InputItem(models.Model):
 
 
 class Machine(models.Model):
-    input_ID = models.ManyToManyField(InputItem)
     machine_Number = models.PositiveIntegerField(null=True)
+    input_ID = models.ManyToManyField(InputItem)
 
     class Meta:
         ordering = ['machine_Number']
