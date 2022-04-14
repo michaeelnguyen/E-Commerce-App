@@ -12,5 +12,6 @@ urlpatterns = [
     path('dashboard/<str:pk>/', storeapp_views.customer_dashboard, name="customer_dashboard"),
     #path('admin_dashboard/', storeapp_views.employee_dashboard, name="employee_dashboard"),
     #path('dashboard/', storeapp_views.customer_dashboard, name="customer_dashboard"),
+    path('shoppingCart/', storeapp_views.shoppingCart, name="shoppingCart"),
 
 ]

@@ -54,8 +54,13 @@ class Employee(models.Model):
 class Vendor(models.Model):
     vendor_name = models.CharField(max_length=255, null=True)
 
+    slug = models.SlugField(max_length=255, null=True)
     date_created = models.DateTimeField(auto_now_add=True, null=True)
     is_active = models.BooleanField(default=True)
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.vendor_name)
+        super(Vendor, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.vendor_name
@@ -64,8 +69,13 @@ class Vendor(models.Model):
 class Expediter(models.Model):
     expediter_name = models.CharField(max_length=255, null=True)
 
+    slug = models.SlugField(max_length=255, null=True)
     date_created = models.DateTimeField(auto_now_add=True, null=True)
     is_active = models.BooleanField(default=True)
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.expediter_name)
+        super(Expediter, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.expediter_name
@@ -83,8 +93,14 @@ class Material(models.Model):
     )
 
     material_Type = models.CharField(max_length=255, null=True)#, choices=MATERIAL_TYPES)
+    
+    slug = models.SlugField(max_length=255, null=True)
     date_created = models.DateTimeField(auto_now_add=True, null=True)
     is_active = models.BooleanField(default=True)
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.material_Type)
+        super(Material, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.material_Type
@@ -180,7 +196,7 @@ class Product(models.Model):
     depth = models.DecimalField(max_digits=5, decimal_places=2, null=True)
 
     category_ID = models.ForeignKey(Category, on_delete=models.RESTRICT)
-    material_ID = models.ForeignKey(Material, null=False, on_delete=models.DO_NOTHING)
+    material_ID = models.ForeignKey(Material, null=True, on_delete=models.DO_NOTHING)
     version_ID = models.ForeignKey(Version, related_name='versionList', null=False, on_delete=models.DO_NOTHING)
     job_ID = models.ForeignKey(Job, null=True, on_delete=models.DO_NOTHING)
     

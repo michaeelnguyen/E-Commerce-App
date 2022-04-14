@@ -111,11 +111,11 @@ class Command(BaseCommand):
 
         for _ in range(len(VENDORS)):
             v = fake.unique.ecommerce_vendor()
-            Vendor.objects.create(vendor_name=v)
+            Vendor.objects.create(vendor_name=v, slug=v)
         
         for _ in range(len(EXPEDITERS)):
             e = fake.unique.ecommerce_expediter()
-            Expediter.objects.create(expediter_name=e)
+            Expediter.objects.create(expediter_name=e, slug=e)
 
         for _ in range(len(CATEGORIES) ):
             c = fake.unique.ecommerce_category()
@@ -123,7 +123,7 @@ class Command(BaseCommand):
         
         for _ in range(len(MATERIAL_TYPES)):
             m = fake.unique.ecommerce_material()
-            Material.objects.create(material_Type=m)
+            Material.objects.create(material_Type=m, slug=m)
 
         # Customer
         for _ in range(numRecords):

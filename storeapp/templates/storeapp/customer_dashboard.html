@@ -2,14 +2,6 @@
 
 {% block content %}
 
-<style>
-	.create_btn {
-		width: 100%;
-		background: #33ccff !important;
-		color: white !important;
-	}
-</style>
-
 <!-- Header-->
 <header class="bg-dark py-5">
 	<div class="container px-4 px-lg-5 my-5">
@@ -19,6 +11,29 @@
 	</div>
 </header>
 
+<br>
+
+<div class="row">
+	<div class="col-md">
+		<div class="card card-body">
+			<h5>Customer:</h5>
+			<hr>
+			<a class="btn btn-outline-primary  btn-sm btn-block" href="">Update Customer</a>
+			<a class="btn btn-outline-danger  btn-sm btn-block" href="">Delete Customer</a>
+
+		</div>
+	</div>
+
+	<div class="col-md">
+		<div class="card card-body">
+			<h5>Contact Information</h5>
+			<hr>
+			<p>Email: {{customer.customer_Email}}</p>
+			<p>Phone: {{customer.customer_Phone_Number}}</p>
+		</div>
+	</div>
+</div>
+
 {%  include 'storeapp/status.html' %}
 <br>
 
@@ -27,15 +42,15 @@
 		<h5>Orders</h5>
 		<hr>
 		<div class="card card-body">
-			<a class="btn btn-sm btn-block create_btn" href="{% url 'productListing' %}">Create Order</a>
+			<a class="btn btn-sm btn-primary" href="{% url 'productListing' %}">Create Order</a>
 			<table class="table table-sm">
 				<tr>
 					<th>Order Confirm No.</th>
 					<th>Date Ordered</th>
 					<th>Status</th>
-					<th>Product Details</th>
-					<th>Update</th>
-					<th>Remove</th>
+					<th>Order Details</th>
+					<th>Update Order</th>
+					<th>Cancel Order</th>
 				</tr>
 
 				{% for order in orders %}
@@ -43,14 +58,12 @@
 						<td>{{order.confirmation_Number}}</td>
 						<td>{{order.order_Date}}</td>
 						<td>{{order.order_Status}}</td>
-						<td><a href="">View</a></td>
-						<td><a href="">Update</a></td>
-						<td><a href="">Delete</a></td>
+						<td><a class="btn btn-sm btn-primary" href="">View</a></td>
+						<td><a class="btn btn-sm btn-primary" href="">Update</a></td>
+						<td><a class="btn btn-sm btn-danger" href="">Cancel</a></td>
 
 					</tr>
 				{% endfor %}
-
-		
 			</table>
 		</div>
 	</div>

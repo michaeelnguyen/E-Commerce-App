@@ -33,6 +33,10 @@ def productsPage(request):
     products = Product.objects.all()
     return render(request, 'storeapp/products.html', {'products': products})
 
+def shoppingCart(request):
+    context = {}
+    return render(request, 'storeapp/shopping_cart.html', context )
+
 def employee_dashboard(request, pk):
     employee = Employee.objects.get(id=pk)
     orders = Order.objects.all()
@@ -55,7 +59,7 @@ def employee_dashboard(request, pk):
 def customer_dashboard(request, pk):
     customer = Customer.objects.get(id=pk)
     orders = customer.order_set.all()
-
+    
     total_orders = orders.count()
     delivered = orders.filter(order_Status='Delivered').count()
     pending = orders.filter(order_Status='Pending').count()
