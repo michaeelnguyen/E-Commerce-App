@@ -29,6 +29,10 @@ def productListing(request):
     context = {}
     return render(request, 'storeapp/product_listing.html', context)
 
+def productDetails(request):
+    context = {}
+    return render(request, 'storeapp/productDetails.html', context)
+
 def productsPage(request):
     products = Product.objects.all()
     return render(request, 'storeapp/products.html', {'products': products})
