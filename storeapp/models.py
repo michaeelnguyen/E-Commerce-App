@@ -114,7 +114,7 @@ class InputItem(models.Model):
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        return self.input_Name
+        return f'{self.input_Name} / QTY: {self.quantity_Per_1000_Units}'
 
 
 class Machine(models.Model):
@@ -181,7 +181,7 @@ class Product(models.Model):
 
     category_ID = models.ForeignKey(Category, on_delete=models.RESTRICT)
     material_ID = models.ForeignKey(Material, null=False, on_delete=models.DO_NOTHING)
-    version_ID = models.ForeignKey(Version, null=False, on_delete=models.DO_NOTHING)
+    version_ID = models.ForeignKey(Version, related_name='versionList', null=False, on_delete=models.DO_NOTHING)
     job_ID = models.ForeignKey(Job, null=True, on_delete=models.DO_NOTHING)
     
     date_created = models.DateTimeField(auto_now_add=True, null=True)
@@ -284,6 +284,7 @@ class Order(models.Model):
 
     order_Date = models.DateTimeField(auto_now_add=True, null=True)
     order_Status = models.CharField(max_length=255, null=True, choices=STATUS)
+    
     confirmation_Number = models.CharField(max_length=255, null=True)
     billing_ID = models.ForeignKey(Billing, null=True, on_delete=models.SET_NULL)
     shipment_ID = models.ForeignKey(Shipping, null=True, on_delete=models.SET_NULL)

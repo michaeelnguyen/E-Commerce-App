@@ -245,7 +245,7 @@ class Command(BaseCommand):
         for _ in range(numRecords):
             cid = random.randint(2, len(CATEGORIES) + 1)
             mid = random.randint(2, len(MATERIAL_TYPES) + 1)
-            vid = random.randint(2, len(VENDORS) + 1)
+            vid = random.randint(2, numRecords + 1)
             jid = random.randint(2, numRecords + 1)
 
 
@@ -262,6 +262,7 @@ class Command(BaseCommand):
                 version_ID_id = vid,
                 job_ID_id = jid,
             )
+            
         # Cart
         cust_id = random.randint(2, numRecords + 1)
         Cart.objects.create(customer_id = cust_id)

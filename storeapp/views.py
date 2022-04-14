@@ -43,8 +43,8 @@ def employee_dashboard(request, pk):
     total_customers = customers.count()
 
     total_orders = orders.count()
-    delivered = orders.filter(status='Delivered').count()
-    pending = orders.filter(status='Pending').count()
+    delivered = orders.filter(order_Status='Delivered').count()
+    pending = orders.filter(order_Status='Pending').count()
 
     context = {'employee':employee,'orders':orders, 'products':products, 'customers':customers,
     'total_orders':total_orders,'delivered':delivered,
@@ -57,8 +57,8 @@ def customer_dashboard(request, pk):
     orders = customer.order_set.all()
 
     total_orders = orders.count()
-    delivered = orders.filter(status='Delivered').count()
-    pending = orders.filter(status='Pending').count()
+    delivered = orders.filter(order_Status='Delivered').count()
+    pending = orders.filter(order_Status='Pending').count()
 
     context = {'orders':orders, 'customer':customer,
     'total_orders':total_orders,'delivered':delivered,

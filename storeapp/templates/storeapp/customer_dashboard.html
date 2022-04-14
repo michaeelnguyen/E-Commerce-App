@@ -30,7 +30,7 @@
 			<a class="btn btn-sm btn-block create_btn" href="{% url 'productListing' %}">Create Order</a>
 			<table class="table table-sm">
 				<tr>
-					<th>Product</th>
+					<th>Order Confirm No.</th>
 					<th>Date Ordered</th>
 					<th>Status</th>
 					<th>Product Details</th>
@@ -40,9 +40,9 @@
 
 				{% for order in orders %}
 					<tr>
-						<td>{{order.product}}</td>
-						<td>{{order.date_Created}}</td>
-						<td>{{order.status}}</td>
+						<td>{{order.confirmation_Number}}</td>
+						<td>{{order.order_Date}}</td>
+						<td>{{order.order_Status}}</td>
 						<td><a href="">View</a></td>
 						<td><a href="">Update</a></td>
 						<td><a href="">Delete</a></td>

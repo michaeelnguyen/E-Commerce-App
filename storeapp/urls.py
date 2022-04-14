@@ -10,5 +10,7 @@ urlpatterns = [
     path('shop/', storeapp_views.productListing, name="productListing"),
     path('admin_dashboard/<str:pk>/', storeapp_views.employee_dashboard, name="employee_dashboard"),
     path('dashboard/<str:pk>/', storeapp_views.customer_dashboard, name="customer_dashboard"),
+    #path('admin_dashboard/', storeapp_views.employee_dashboard, name="employee_dashboard"),
+    #path('dashboard/', storeapp_views.customer_dashboard, name="customer_dashboard"),
 
 ]

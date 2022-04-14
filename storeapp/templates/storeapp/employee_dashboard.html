@@ -62,9 +62,9 @@
 
 				{% for order in orders %}
 					<tr>
-						<td>{{order.product}}</td>
-						<td>{{order.date_Created}}</td>
-						<td>{{order.status}}</td>
+						<td>{{order.confirmation_Number}}</td>
+						<td>{{order.date_created}}</td>
+						<td>{{order.order_Status}}</td>
 						<td><a href="">Update</a></td>
 						<td><a href="">Delete</a></td>
 
@@ -93,7 +93,7 @@
 				{% for product in products %}
 					<tr>
 						<td>{{product.product_Name}}</td>
-						<td>{{product.product_Version}}</td>
+						<td>{{product.version_ID}}</td>
 						<td>{{product.product_Stock}}</td>
 						<td>{{product.product_Price}}</td>
 						<td><a href="">Update</a></td>
