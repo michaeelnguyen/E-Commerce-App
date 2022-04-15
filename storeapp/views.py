@@ -26,8 +26,8 @@ def loginPage(request):
     return render(request, 'storeapp/login.html', context )
 
 def productListing(request):
-    context = {}
-    return render(request, 'storeapp/product_listing.html', context)
+    products = Product.objects.all()
+    return render(request, 'storeapp/product_listing.html', {'products': products})
 
 def productDetails(request):
     context = {}

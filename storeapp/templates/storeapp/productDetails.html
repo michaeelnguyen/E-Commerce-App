@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
@@ -32,7 +34,7 @@
                         <p class="lead">Lorem ipsum dolor sit amet consectetur adipisicing elit. Praesentium at dolorem quidem modi. Nam sequi consequatur obcaecati excepturi alias magni, accusamus eius blanditiis delectus ipsam minima ea iste laborum vero?</p>
                         <div class="d-flex">
                             <input class="form-control text-center me-3" id="inputQuantity" type="num" value="1" style="max-width: 3rem" />
-                            <button class="btn btn-outline-dark flex-shrink-0" type="button">
+                            <button class="btn btn-outline-dark flex-shrink-0" type="button" id="add-button" value="{{product.id}}">
                                 <i class="bi-cart-fill me-1"></i>
                                 Add to cart
                             </button>
@@ -40,11 +42,32 @@
                     </div>
                 </div>
             </div>
+
         </section>
         <!-- Related items section-->
         <section class="py-5 bg-light">
         Product Description
         </section>
+
+        <script>
+            $(document).on('click', '#add-button', function(e){
+                e.preventDefault();
+                $.ajax({
+                    type: 'POST',
+                    url: '{% url "basket:basket_add" %}',
+                    data:{
+                        productid: $('#add-button').val(),
+                        csrfmiddlewaretoken: "{{csrf_token}}",
+                        action: 'post',
+                    },
+                    success: function (json) {
+
+                    },
+                    error: function(xhr, errmsg, err) {}                
+                });
+            })
+        </script>
+
         <!-- Footer-->
         <footer class="py-5 bg-dark">
             <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2022</p></div>
