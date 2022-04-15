@@ -11,6 +11,60 @@
     </div>
 </header>
 
+
+
 {% block content %}
-    Basket Page
+
+<main class="pt-5">
+    <div class="container">
+        <h1 class="h5">Shopping Cart</h1>
+        
+        {% for item in basket %}
+        {% with product=item.product %}
+
+        <div class="card mb-3 border-1 product-item" data-index="{{product.id}}">
+            <div class="row g-0">
+              <div class="col-md-2 d-none d-md-block">
+                <img class="img-fluid mx-auto d-block" alt=" Product Image" src="{{ product.version_ID.product_Image }}" />
+              </div>
+              <div class="col-md-10 ps-md-3">
+                <div class="card-body p-1">
+                  <a class="text-decoration-none text-reset" href="{{item.product.get_absolute_url}}">
+                    <p class="card-text pb-0">Product: {{product.product_Name}}</p>
+                    <p class="card-text pb-2">Dimensions: {{product.height}} x {{product.width}} x {{product.depth}} (ft.)</p>
+                    <p class="card-text pb-2">Item Price: ${{product.product_Price}}</p>
+                </a>
+
+                  <label for="select">Qty (per 1000 units)</label>
+                  <select id="select{{product.id}}" style="width:50px;height:31px;">
+                    <option value="" selected disabled hidden>{{item.qty}}</option>
+                    <option value="">1</option>
+                    <option value="">2</option>
+                    <option value="">3</option>
+                    <option value="">4</option>
+                    <option value="">5</option>
+                    <option value="">6</option>
+                    <option value="">7</option>
+                    <option value="">8</option>
+                    <option value="">9</option>
+                    <option value="">10</option>
+                  </select>
+                  <a type="button" id="update-button" data-index="{{product.id}}"
+                    class="update-button text-decoration-none small ps-3">Update</a>
+                  <a type="button" id="delete-button" data-index="{{product.id}}"
+                    class="delete-button text-decoration-none small">Delete</a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        {% endwith %}
+        {% endfor %}
+
+        <div class="col-12 text-end">
+        <div class="h6 fw-bold">
+            Sub Total: $<span id="subtotal">{{basket.get_total_price}}</span>
+        </div>
+    </div>
+</main>
 {% endblock %}
