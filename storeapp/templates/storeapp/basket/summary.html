@@ -12,7 +12,6 @@
 </header>
 
 
-
 {% block content %}
 
 <main class="pt-5">
@@ -38,7 +37,9 @@
 
                   <label for="select">Qty (per 1000 units)</label>
                   <select id="select{{product.id}}" style="width:50px;height:31px;">
-                    <option value="" selected disabled hidden>{{item.qty}}</option>
+                    <option selected disabled hidden>
+                        {{item.qty}}
+                    </option>
                     <option value="">1</option>
                     <option value="">2</option>
                     <option value="">3</option>
@@ -50,10 +51,8 @@
                     <option value="">9</option>
                     <option value="">10</option>
                   </select>
-                  <a type="button" id="update-button" data-index="{{product.id}}"
-                    class="update-button text-decoration-none small ps-3">Update</a>
-                  <a type="button" id="delete-button" data-index="{{product.id}}"
-                    class="delete-button text-decoration-none small">Delete</a>
+                  <a type="button" id="update-button" data-index="{{product.id}}" class="update-button btn-sm text-decoration-none small ps-3">Update</a>
+                  <a type="button" id="delete-button" data-index="{{product.id}}" class="delete-button btn-sm text-decoration-none small">Delete</a>
                 </div>
               </div>
             </div>
@@ -64,7 +63,7 @@
 
         <div class="col-12 text-end">
         <div class="h6 fw-bold">
-            Sub Total: $<span id="subtotal">{{basket.get_total_price}}</span>
+            Sub Total: $<div id="subtotal" class="d-inline-flex">{{basket.get_total_price}}</div>
         </div>
     </div>
 </main>
@@ -72,7 +71,7 @@
 <script>
     $(document).on('click', '.delete-button', function(e){
         e.preventDefault();
-        var pid =$(this).data("index")
+        var pid = $(this).data("index")
         $.ajax({
             type: 'POST',
             url: '{% url "basket:basket_delete" %}',
@@ -82,7 +81,31 @@
                 action: 'post',
             },
             success: function (json) {
+                $('.product-item[data-index="' + pid + '"]').remove();
                 document.getElementById("basket-qty").innerHTML = json.qty
+                document.getElementById("subtotal").innerHTML = json.subtotal
+            },
+            error: function(xhr, errmsg, err) {}                
+        });
+    })
+
+
+    // Update Item
+    $(document).on('click', '.update-button', function(e){
+        e.preventDefault();
+        var pid = $(this).data("index")
+        $.ajax({
+            type: 'POST',
+            url: '{% url "basket:basket_update" %}',
+            data:{
+                productid: $(this).data("index"),
+                productqty: $('#select'+ pid +' option:selected').text(),
+                csrfmiddlewaretoken: "{{csrf_token}}",
+                action: 'post',
+            },
+            success: function (json) {
+                document.getElementById("basket-qty").innerHTML = json.qty
+                document.getElementById("subtotal").innerHTML = json.subtotal
             },
             error: function(xhr, errmsg, err) {}                
         });
