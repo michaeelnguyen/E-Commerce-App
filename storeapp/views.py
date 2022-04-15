@@ -1,9 +1,10 @@
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.http import HttpResponse
 from django.forms import inlineformset_factory
 from django.contrib.auth.forms import UserCreationForm
 
 from .models import *
+from .forms import *
 
 # Create your views here.
 
@@ -41,8 +42,7 @@ def shoppingCart(request):
     context = {}
     return render(request, 'storeapp/shopping_cart.html', context )
 
-def employee_dashboard(request, pk):
-    employee = Employee.objects.get(id=pk)
+def employee_dashboard(request):
     orders = Order.objects.all()
     products = Product.objects.all()
 
@@ -54,7 +54,7 @@ def employee_dashboard(request, pk):
     delivered = orders.filter(order_Status='Delivered').count()
     pending = orders.filter(order_Status='Pending').count()
 
-    context = {'employee':employee,'orders':orders, 'products':products, 'customers':customers,
+    context = {'orders':orders, 'products':products, 'customers':customers,
     'total_orders':total_orders,'delivered':delivered,
     'pending':pending}
 
@@ -73,3 +73,87 @@ def customer_dashboard(request, pk):
     'pending':pending }
 
     return render(request, 'storeapp/customer_dashboard.html', context)
+
+
+def createCustomer(request):
+    form = CustomerRegistrationForm()
+    if request.method == 'POST':
+        form = CustomerRegistrationForm(request.POST)
+        if form.is_valid():
+            form.save()
+    
+    context = {'form': form}
+    return render(request, 'storeapp/orderUpdateForm.html', context)
+
+def updateCustomer(request, pk):
+    
+    customer = Customer.objects.get(id=pk)
+    form = CustomerRegistrationForm(instance=customer)    
+
+    if request.method == 'POST':
+        form = ProductForm(request.POST, instance=customer)
+        if form.is_valid():
+            form.save()
+            return redirect('/')
+
+    context = {'form': form}
+    return render(request, 'storeapp/orderUpdateForm.html', context)
+
+
+
+def createOrder(request):
+
+    form = OrderForm()
+    if request.method == 'POST':
+        form = OrderForm(request.POST)
+        if form.is_valid():
+            form.save()
+    
+    context = {'form': form}
+    return render(request, 'storeapp/orderUpdateForm.html', context)
+
+def updateOrder(request, pk):
+
+    order = Order.objects.get(id=pk)
+    form = OrderForm(instance=order)    
+
+    if request.method == 'POST':
+        form = OrderForm(request.POST, instance=order)
+        if form.is_valid():
+            form.save()
+            return redirect('/')
+
+    context = {'form': form}
+    return render(request, 'storeapp/orderUpdateForm.html', context)
+
+def deleteOrder(request, pk):
+    order = Order.objects.get(id=pk)
+
+    context = {'item': order}
+    return render(request, 'storeapp/delete.html', context)
+
+
+
+def createProduct(request):
+    form = ProductForm()
+    if request.method == 'POST':
+        form = ProductForm(request.POST)
+        if form.is_valid():
+            form.save()
+    
+    context = {'form': form}
+    return render(request, 'storeapp/orderUpdateForm.html', context)
+
+def updateProduct(request, pk):
+    
+    product = Product.objects.get(id=pk)
+    form = ProductForm(instance=product)    
+
+    if request.method == 'POST':
+        form = ProductForm(request.POST, instance=product)
+        if form.is_valid():
+            form.save()
+            return redirect('/')
+
+    context = {'form': form}
+    return render(request, 'storeapp/orderUpdateForm.html', context)

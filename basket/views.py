@@ -9,6 +9,7 @@ def basket_summary(request):
     basket = Basket(request)
     return render(request, 'storeapp/basket/summary.html', {'basket': basket})
 
+
 def basket_add(request):
     basket = Basket(request)
     if request.POST.get('action') == 'post':
@@ -19,13 +20,13 @@ def basket_add(request):
 
         basketqty = basket.__len__()
         response = JsonResponse({'qty': basketqty})
-
         return response
+
 
 def basket_delete(request):
     basket = Basket(request)
     if request.POST.get('action') == 'post':
-        product_id = request.POST.get('productid')
+        product_id = int(request.POST.get('productid'))
         basket.delete(product=product_id)
 
         basketqty = basket.__len__()

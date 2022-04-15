@@ -16,7 +16,9 @@ class Basket():
     def add(self, product, qty):
         product_id = str(product.id)
 
-        if product_id not in self.basket:
+        if product_id in self.basket:
+            self.basket[product_id]['qty'] = qty
+        else:
             self.basket[product_id] = {'price': str(product.product_Price), 'qty': int(qty)}
         
         self.save()
@@ -68,8 +70,6 @@ class Basket():
         if product_id in self.basket:
             self.basket[product_id]['qty'] = qty
             self.save()
-
-
 
     def save(self):
         self.session.modified = True

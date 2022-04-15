@@ -20,7 +20,7 @@
 		<h5>CUSTOMERS</h5>
 		<hr>
 		<div class="card card-body">
-			<a class="btn btn-sm btn-primary" href="">Create Customer</a>
+			<a class="btn btn-sm btn-primary" href="{% url 'create_customer' %}">Create Customer</a>
 			
 			<table class="table table-sm">
 				<tr>
@@ -34,6 +34,7 @@
 						<td>{{customer.customer_First_Name}} {{customer.customer_Last_Name}}</td>
 						<td>{{customer.customer_Email}}</td>
 						<td>{{customer.customer_Phone_Number}}</td>
+						<td><a class="btn btn-sm btn-primary" href="{% url 'update_customer' customer.id %}">Update</a></td>
 					</tr>
 				{% endfor %}
 
@@ -45,7 +46,7 @@
 		<h5>LAST 5 ORDERS</h5>
 		<hr>
 		<div class="card card-body">
-			<a class="btn btn-sm btn-primary" href="">Create Order</a>
+			<a class="btn btn-sm btn-primary" href="{% url 'create_order' %}">Create Order</a>
 			<table class="table table-sm">
 				<tr>
 					<th>Product</th>
@@ -58,8 +59,8 @@
 						<td>{{order.cart}}</td>
 						<td>{{order.date_created}}</td>
 						<td>{{order.order_Status}}</td>
-						<td><a href="">Update</a></td>
-						<td><a href="">Delete</a></td>
+						<td><a href="{% url 'update_order' order.id %}">Update</a></td>
+						<td><a href="{% url 'delete_order' order.id %}">Cancel</a></td>
 
 					</tr>
 				{% endfor %}
@@ -73,7 +74,7 @@
 		<h5>PRODUCTS</h5>
 		<hr>
 		<div class="card card-body">
-			<a class="btn btn-sm btn-primary" href="">Create Product</a>
+			<a class="btn btn-sm btn-primary" href="{% url 'create_product' %}">Create Product</a>
 			
 			<table class="table table-sm">
 				<tr>
@@ -89,8 +90,8 @@
 						<td>{{product.version_ID}}</td>
 						<td>{{product.product_Stock}}</td>
 						<td>{{product.product_Price}}</td>
-						<td><a class="btn btn-sm btn-primary" href="">Update</a></td>
-						<td><a class="btn btn-sm btn-danger" href="">Delete</a></td>
+						<td><a class="btn btn-sm btn-primary" href="{% url 'update_product' product.id %}">Update</a></td>
+						<td><a class="btn btn-sm btn-danger" href="">Remove</a></td>
 					</tr>
 				{% endfor %}
 
