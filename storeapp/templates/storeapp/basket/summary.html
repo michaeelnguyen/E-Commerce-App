@@ -25,14 +25,15 @@
         <div class="card mb-3 border-1 product-item" data-index="{{product.id}}">
             <div class="row g-0">
               <div class="col-md-2 d-none d-md-block">
-                <img class="img-fluid mx-auto d-block" alt=" Product Image" src="{{ product.version_ID.product_Image }}" />
+                <img class="img-fluid mx-auto d-block" alt=" Product Image" src="#" />
               </div>
               <div class="col-md-10 ps-md-3">
                 <div class="card-body p-1">
                   <a class="text-decoration-none text-reset" href="{{item.product.get_absolute_url}}">
                     <p class="card-text pb-0">Product: {{product.product_Name}}</p>
-                    <p class="card-text pb-2">Dimensions: {{product.height}} x {{product.width}} x {{product.depth}} (ft.)</p>
-                    <p class="card-text pb-2">Item Price: ${{product.product_Price}}</p>
+                    <p class="card-text pb-2">Dimensions: {{product.height}} x {{product.width}} x {{product.depth}} ft.</p>
+                    <p class="card-text pb-2">Material: {{product.material_ID.material_Type}}</p>
+                    <p class="card-text pb-2">Price: ${{product.product_Price}}</p>
                 </a>
 
                   <label for="select">Qty (per 1000 units)</label>
@@ -67,4 +68,25 @@
         </div>
     </div>
 </main>
+
+<script>
+    $(document).on('click', '.delete-button', function(e){
+        e.preventDefault();
+        var pid =$(this).data("index")
+        $.ajax({
+            type: 'POST',
+            url: '{% url "basket:basket_delete" %}',
+            data:{
+                productid: $(this).data("index"),
+                csrfmiddlewaretoken: "{{csrf_token}}",
+                action: 'post',
+            },
+            success: function (json) {
+                document.getElementById("basket-qty").innerHTML = json.qty
+            },
+            error: function(xhr, errmsg, err) {}                
+        });
+    })
+</script>
+
 {% endblock %}
