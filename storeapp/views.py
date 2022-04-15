@@ -29,9 +29,9 @@ def productListing(request):
     products = Product.objects.all()
     return render(request, 'storeapp/product_listing.html', {'products': products})
 
-def productDetails(request):
-    context = {}
-    return render(request, 'storeapp/productDetails.html', context)
+def productDetails(request, pk):
+    product = Product.objects.get(id=pk)
+    return render(request, 'storeapp/productDetails.html', {'product': product})
 
 def productsPage(request):
     products = Product.objects.all()
