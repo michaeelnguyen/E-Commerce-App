@@ -4,7 +4,7 @@ from django.forms import inlineformset_factory
 from django.contrib.auth.forms import UserCreationForm
 
 from .models import *
-from .forms import OrderForm, ProductForm
+from .forms import OrderForm, ProductForm, CreateUserForm
 from .filters import OrderFilter
 
 # Create your views here.
@@ -13,10 +13,10 @@ def homePage(request):
     return render(request, 'storeapp/home.html')
 
 def registerPage(request):
-    form = UserCreationForm()
+    form = CreateUserForm()
 
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = CreateUserForm(request.POST)
         if form.is_valid():
             form.save()
 
