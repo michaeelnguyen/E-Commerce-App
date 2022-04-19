@@ -142,26 +142,32 @@
                             </div>
 
 
-
                             <div class="input-group mb-2">
+                                <div class="input-group-append">
+                                    <span class="input-group-text"><i class="fas fa-phone-square"></i></span>
+                                </div>
+                                <input type="text" name="customer_Phone_Number">
+                            </div>
+                            <div class="input-group mb-4">
                                 <div class="input-group-append">
                                     <span class="input-group-text"><i class="fas fa-envelope-square"></i></span>
                                 </div>
                                 <input type="email" name="customer_Email">
                             </div>
-                            <div class="input-group mb-4">
+
+
+                            <div class="input-group mb-2">
                                 <div class="input-group-append">
-                                    <span class="input-group-text"><i class="fas fa-phone-square"></i></span>
+                                    <span class="input-group-text"><i class="fas fa-user"></i></span>
                                 </div>
-                                <input type="email" name="customer_Phone_Number">
+                                <input type="text" name="user_name">
                             </div>
-
-
                             <div class="input-group mb-2">
                                 <div class="input-group-append">
                                     <span class="input-group-text"><i class="fas fa-key"></i></span>
                                 </div>
                                 <input type="password" name="password1">
+                                
                             </div>
                             <div class="input-group mb-2">
                                 <div class="input-group-append">
@@ -197,11 +203,14 @@
             form_fields[4].placeholder='City';
             form_fields[5].placeholder='State';
             form_fields[6].placeholder='Zip Code';
-            form_fields[7].placeholder='Email';
+            
 
-            form_fields[8].placeholder='Phone Number';
-            form_fields[9].placeholder='Enter Password...';
-            form_fields[10].placeholder='Re-enter Password...';
+            form_fields[7].placeholder='Phone Number';
+            form_fields[8].placeholder='Email';
+
+            form_fields[9].placeholder='User Name';
+            form_fields[10].placeholder='Enter Password...';
+            form_fields[11].placeholder='Re-enter Password...';
 
 
             for (var field in form_fields){	
