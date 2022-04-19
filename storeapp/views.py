@@ -4,7 +4,7 @@ from django.forms import inlineformset_factory
 from django.contrib.auth.forms import UserCreationForm
 
 from .models import *
-from .forms import *
+from .forms import OrderForm, ProductForm
 from .filters import OrderFilter
 
 # Create your views here.
@@ -79,7 +79,7 @@ def customer_dashboard(request, pk):
     return render(request, 'storeapp/customer_dashboard.html', context)
 
 
-def createCustomer(request):
+''' def createCustomer(request):
     form = CustomerRegistrationForm()
     if request.method == 'POST':
         form = CustomerRegistrationForm(request.POST)
@@ -101,7 +101,7 @@ def updateCustomer(request, pk):
             return redirect('/')
 
     context = {'form': form}
-    return render(request, 'storeapp/update.html', context)
+    return render(request, 'storeapp/update.html', context) '''
 
 
 

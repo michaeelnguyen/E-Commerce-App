@@ -22,6 +22,7 @@ class Customer(models.Model):
     slug = models.SlugField(max_length=255, null=True)
     date_created = models.DateTimeField(auto_now_add=True, null=True)
     is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.customer_First_Name + " " + self.customer_Last_Name)
@@ -42,6 +43,7 @@ class Employee(models.Model):
     slug = models.SlugField(max_length=255, null=True)
     date_created = models.DateTimeField(auto_now_add=True, null=True)
     is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=True)
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.employee_First_Name + " " + self.employee_Last_Name)
