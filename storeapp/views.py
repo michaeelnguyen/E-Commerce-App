@@ -5,6 +5,7 @@ from django.contrib.auth.forms import UserCreationForm
 
 from .models import *
 from .forms import *
+from .filters import OrderFilter
 
 # Create your views here.
 
@@ -68,9 +69,12 @@ def customer_dashboard(request, pk):
     delivered = orders.filter(order_Status='Delivered').count()
     pending = orders.filter(order_Status='Pending').count()
 
+    myFilter = OrderFilter(request.GET, queryset=orders)
+    orders = myFilter.qs
+
     context = {'orders':orders, 'customer':customer,
     'total_orders':total_orders,'delivered':delivered,
-    'pending':pending }
+    'pending':pending, 'myFilter': myFilter }
 
     return render(request, 'storeapp/customer_dashboard.html', context)
 
@@ -83,7 +87,7 @@ def createCustomer(request):
             form.save()
     
     context = {'form': form}
-    return render(request, 'storeapp/orderUpdateForm.html', context)
+    return render(request, 'storeapp/update.html', context)
 
 def updateCustomer(request, pk):
     
@@ -97,19 +101,22 @@ def updateCustomer(request, pk):
             return redirect('/')
 
     context = {'form': form}
-    return render(request, 'storeapp/orderUpdateForm.html', context)
+    return render(request, 'storeapp/update.html', context)
 
 
 
-def createOrder(request):
-
-    form = OrderForm()
+def createOrder(request, pk):
+    OrderFormSet = inlineformset_factory(Customer, Order, fields=('product', 'order_Status'), extra=5)
+    customer = Customer.objects.get(id=pk)
+    formset = OrderFormSet(queryset=Order.objects.none(), instance=customer)
+    #form = OrderForm(initial={'customer': customer})
     if request.method == 'POST':
-        form = OrderForm(request.POST)
-        if form.is_valid():
-            form.save()
+        formset = OrderFormSet(request.POST, instance=customer)
+        if formset.is_valid():
+            formset.save()
+            return redirect('/')
     
-    context = {'form': form}
+    context = {'formset': formset}
     return render(request, 'storeapp/orderUpdateForm.html', context)
 
 def updateOrder(request, pk):
@@ -124,7 +131,7 @@ def updateOrder(request, pk):
             return redirect('/')
 
     context = {'form': form}
-    return render(request, 'storeapp/orderUpdateForm.html', context)
+    return render(request, 'storeapp/update.html', context)
 
 def deleteOrder(request, pk):
     order = Order.objects.get(id=pk)
@@ -142,7 +149,7 @@ def createProduct(request):
             form.save()
     
     context = {'form': form}
-    return render(request, 'storeapp/orderUpdateForm.html', context)
+    return render(request, 'storeapp/update.html', context)
 
 def updateProduct(request, pk):
     
@@ -156,4 +163,4 @@ def updateProduct(request, pk):
             return redirect('/')
 
     context = {'form': form}
-    return render(request, 'storeapp/orderUpdateForm.html', context)
+    return render(request, 'storeapp/update.html', context)

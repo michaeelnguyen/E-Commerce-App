@@ -200,6 +200,8 @@ class Product(models.Model):
     version_ID = models.ForeignKey(Version, related_name='versionList', null=False, on_delete=models.DO_NOTHING)
     job_ID = models.ForeignKey(Job, null=True, on_delete=models.DO_NOTHING)
     
+    is_custom = models.BooleanField(default=False)
+    
     date_created = models.DateTimeField(auto_now_add=True, null=True)
     is_active = models.BooleanField(default=True)
 
@@ -258,32 +260,6 @@ class Shipping(models.Model):
         return f'ADDRESS: {self.shipping_Address}, {self.shipping_City}, {self.shipping_State}, {self.shipping_Zip} -- DATE SHIPPED: {self.date_Shipped.strftime("%d.%m.%Y")}'
 
 
-class Cart(models.Model):
-    customer = models.ForeignKey(Customer, null=True, on_delete=models.SET_NULL)
-    
-    date_created = models.DateTimeField(auto_now_add=True, null=True)
-
-    class Meta: 
-        ordering = ['customer']
-    
-    def __str__(self):
-        return f'Cart Session ID #{self.id}'
-
-#class OrderQuantity(models.Model):
-class CartItem(models.Model):
-    cart = models.ForeignKey(Cart, null=True, on_delete=models.SET_NULL)
-    product_id = models.ForeignKey(Product, null=True, on_delete=models.SET_NULL)
-    item_quantity = models.PositiveIntegerField(null=True)
-
-    date_created = models.DateTimeField(auto_now_add=True, null=True)
-
-    class Meta: 
-        ordering = ['product_id']
-
-    def __str__(self):
-        return f'{self.product_id}, Qty: {self.item_quantity}'
-
-
 class Order(models.Model):
     STATUS = (
         ('Pending', 'Pending'),
@@ -293,10 +269,7 @@ class Order(models.Model):
     )
 
     customer = models.ForeignKey(Customer, null=True, on_delete=models.SET_NULL)
-
-    cart = models.ForeignKey(Cart, null=True, on_delete=models.SET_NULL)
-    #product = models.ForeignKey(Product, null=True, on_delete=models.SET_NULL)
-    #order_quantity_ID = models.ForeignKey(OrderQuantity, null=True, on_delete=models.SET_NULL)
+    product = models.ForeignKey(Product, null=True, on_delete=models.SET_NULL)
 
     order_Date = models.DateTimeField(auto_now_add=True, null=True)
     order_Status = models.CharField(max_length=255, null=True, choices=STATUS)

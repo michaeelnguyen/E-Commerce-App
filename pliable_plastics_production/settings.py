@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'bootstrap5',
     'storeapp',
-    'basket'
+    'basket',
+    'django_filters',
 ]
 
 MIDDLEWARE = [

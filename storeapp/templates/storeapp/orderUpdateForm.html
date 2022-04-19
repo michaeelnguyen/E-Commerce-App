@@ -37,7 +37,11 @@
             <div class="col-md-2">
             <form action="" method="POST">
                 {% csrf_token %}
-                {{form}}
+                {{ formset.management_form }}
+                {% for form in formset %}
+                    {{form}}
+                    <hr>
+                {% endfor %}
                 <input type="submit" name="Submit">
             </form>
         </div>

@@ -19,7 +19,7 @@ urlpatterns = [
     #path('dashboard/', storeapp_views.customer_dashboard, name="customer_dashboard"),
     path('shoppingCart/', storeapp_views.shoppingCart, name="shoppingCart"),
 
-    path('create_order/', storeapp_views.createOrder, name="create_order"),
+    path('create_order/<str:pk>/', storeapp_views.createOrder, name="create_order"),
     path('update_order/<str:pk>/', storeapp_views.updateOrder, name="update_order"),
     path('delete_order/<str:pk>/', storeapp_views.deleteOrder, name="delete_order"),
 
