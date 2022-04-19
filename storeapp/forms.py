@@ -10,10 +10,10 @@ class OrderForm(ModelForm):
         model = Order
         fields = '__all__'
 
-class CustomerRegistrationForm(ModelForm):
+class CustomerRegistrationForm(UserCreationForm):
     class Meta:
-        model = Customer
-        fields = '__all__'
+        model = User
+        fields = ['username', 'email', 'password1', 'password2']
 
 class ProductForm(ModelForm):
     class Meta:

@@ -1,17 +1,17 @@
 from django.db import models
-from django.core.validators import MaxValueValidator, MinValueValidator
-from django.utils.functional import lazy
 from django.utils.text import slugify
-
-
-
+from django.utils.translation import gettext_lazy as _
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 
 # Create your models here.
 
 class Customer(models.Model):
+    #customer_Username = models.CharField(max_length=255, unique=True)
+
     customer_First_Name = models.CharField(max_length=255, null=True)
     customer_Last_Name = models.CharField(max_length=255, null=True)
     customer_Phone_Number= models.CharField(max_length=255, null=True)
+
     customer_Email = models.EmailField(max_length=255, null=True)
     customer_Password= models.CharField(max_length=255, null=True)
     street_Address = models.CharField(max_length=255, null=True)
