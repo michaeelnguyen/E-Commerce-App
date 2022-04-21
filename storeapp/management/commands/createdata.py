@@ -2,7 +2,8 @@ import random
 from django.core.management.base import BaseCommand
 from faker import Faker
 from faker.providers import BaseProvider
-from storeapp.models import Category, Customer, Employee, Machine, Product, Material, Vendor, Expediter, Version, InputItem, Billing, Shipping, Job, Cart, CartItem, Order
+from storeapp.models import Category, Customer, Employee, Machine, Product, Material, Vendor, Expediter, Version, InputItem, Billing, Shipping, Job, Order
+from django.contrib.auth.models import User
 
 import datetime
 from django.conf import settings
@@ -124,6 +125,24 @@ class Command(BaseCommand):
         for _ in range(len(MATERIAL_TYPES)):
             m = fake.unique.ecommerce_material()
             Material.objects.create(material_Type=m, slug=m)
+        
+        # Users
+        for _ in range(numRecords):
+            fn = fake.first_name()
+            ln = fake.last_name()
+
+            un = fn + ln + str(random.randint(1, 9999))
+            email = fake.ascii_email()
+            pw = fake.password(length=12)
+
+            user = User.objects.create(
+                username = un,
+                first_name = fn,
+                last_name = ln,
+                email = email,
+            )
+            user.set_password(pw)
+            user.save()
 
         # Customer
         for _ in range(numRecords):
@@ -131,7 +150,6 @@ class Command(BaseCommand):
             ln = fake.last_name()
             pn = fake.unique.phone_number()
             email = fake.ascii_email()
-            pw = fake.password(length=12)
             addr = fake.street_address()
             c = fake.city()
             st = fake.administrative_unit()
@@ -176,7 +194,7 @@ class Command(BaseCommand):
            input = fake.ecommerce_inputItem()
            qty = random.randint(1, 500)
            mc = fake.sentence()
-           vid = random.randint(2, len(VENDORS) + 1)
+           vid = random.randint(1, len(VENDORS))
 
            InputItem.objects.create(
                input_Name = input,
@@ -184,7 +202,7 @@ class Command(BaseCommand):
                vendor_id = vid,
                message_Commands = mc,
            )
-           
+
         # Machine
         l = random.sample(range(1,30), 15)
         for _ in range(numRecords):
@@ -207,7 +225,6 @@ class Command(BaseCommand):
             ln = fake.last_name()
             pn = fake.unique.phone_number()
             email = fake.ascii_company_email()
-            pw = fake.password(length=12)
             r = fake.job()
             s = fn + "-" + ln
 
@@ -228,8 +245,8 @@ class Command(BaseCommand):
             qc = fake.paragraph()
             dc = random.randint(50,400)
 
-            mach_id = random.randint(2, numRecords + 1)
-            eid = random.randint(2, numRecords + 1)
+            mach_id = random.randint(1, numRecords)
+            eid = random.randint(1, numRecords)
 
             Job.objects.create(
                 machine_ID_id = mach_id, 
@@ -240,13 +257,13 @@ class Command(BaseCommand):
                 defect_Count = dc,
                 
             )
-
+        
         # Products
         for _ in range(numRecords):
-            cid = random.randint(2, len(CATEGORIES) + 1)
-            mid = random.randint(2, len(MATERIAL_TYPES) + 1)
-            vid = random.randint(2, numRecords + 1)
-            jid = random.randint(2, numRecords + 1)
+            cid = random.randint(1, len(CATEGORIES))
+            mid = random.randint(1, len(MATERIAL_TYPES))
+            vid = random.randint(1, numRecords)
+            jid = random.randint(1, numRecords)
 
 
             Product.objects.create(
@@ -278,6 +295,7 @@ class Command(BaseCommand):
                 product_id_id = pid,
                 item_quantity = i_qty,
             )
+        
         # Billing
         for _ in range(numRecords):
             addr = fake.street_address()
@@ -286,14 +304,17 @@ class Command(BaseCommand):
             z = fake.postcode()
             b_date = fake.past_datetime(start_date='-10d')
 
+            cust_id = random.randint(1, numRecords)
+
             Billing.objects.create(
+                customer_id = cust_id,
                 billing_Address = addr,
                 billing_City = c,
                 billing_State = st,
                 billing_Zip = z,
                 date_Billed = b_date,
             )
-
+        
         # Shipping
         for _ in range(numRecords):
             addr = fake.street_address()
@@ -302,14 +323,16 @@ class Command(BaseCommand):
             z = fake.postcode()
 
             s_date = fake.past_datetime(start_date='-5d')
-
-            eid = random.randint(2, len(EXPEDITERS) + 1)
+            
+            cust_id = random.randint(1, numRecords)
+            eid = random.randint(1, len(EXPEDITERS))
             
             sc = round(random.uniform(4.99, 20),2)
             sqty = random.randint(1, 30)
             swt = round(random.uniform(0.01, 500),2)
 
             Shipping.objects.create(
+                customer_id = cust_id,
                 shipping_Address = addr,
                 shipping_City = c,
                 shipping_State = st,
@@ -322,6 +345,7 @@ class Command(BaseCommand):
                 shipment_Quantity = sqty, 
                 shipment_Weight = swt,
             )
+
         # Orders
         for _ in range(numRecords):
             o_date = fake.past_datetime(start_date='-40d')
@@ -336,7 +360,6 @@ class Command(BaseCommand):
 
             Order.objects.create(
                 customer_id = cust_id,
-                #cart_id = cid,
                 order_Date = o_date, 
                 order_Status = status,
                 confirmation_Number = c_no, 

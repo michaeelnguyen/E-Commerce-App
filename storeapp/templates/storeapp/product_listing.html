@@ -15,6 +15,15 @@
         <!-- Core theme CSS (includes Bootstrap)-->
         <link href="{% static 'css/styles.css' %}" rel="stylesheet" />
     </head>
+
+    <style>
+    .instock_icon {
+        display: block;
+        max-width: 10%;
+        height: auto;
+        }
+    </style>
+
     <body>
         
         {%  include 'storeapp/base.html' %}
@@ -59,16 +68,22 @@
                             <!-- Sale badge-->
                             <div class="badge bg-dark text-white position-absolute" style="top: 0.5rem; right: 0.5rem">Sale</div>
                             <!-- Product image-->
-                            <img class="card-img-top" src="https://dummyimage.com/450x300/dee2e6/6c757d.jpg" alt="..." />
+                            <img class="card-img-top" src="{{product.imageURL}}" alt="..." />
                             <!-- Product details-->
                             <div class="card-body p-4">
                                 <div class="text-center">
                                     <!-- Product name-->
                                     <h5 class="fw-bolder">{{product.product_Name}}</h5>
+                                    <div class="d-flex justify-content-center small mb-3">
                                     {{product.material_ID.material_Type}}
+                                    </div>
                                     <!-- Product reviews-->
-                                    <div class="d-flex justify-content-center small text-warning mb-2">
-                                        {{product.product_Stock}}
+                                    <div class="d-flex justify-content-center small mb-2">
+                                        {% if product.product_Stock %}
+                                            <p class="text-success">In Stock</p>
+                                        {% else %}
+                                            <p class="text-danger">Out of Stock</p>
+                                        {% endif %}
                                     </div>
                                     <!-- Product price-->
                                     ${{product.product_Price}}
@@ -76,7 +91,10 @@
                             </div>
                             <!-- Product actions-->
                             <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
-                                <div class="text-center"><a class="btn btn-outline-dark mt-auto" href="{% url 'productDetails' product.id %}">View details</a></div>
+                                <div class="text-center"><a class="btn btn-outline-dark mt-auto mb-2" href="{% url 'productDetails' product.id %}">View details</a></div>
+                                {% if request.user.is_staff == False %}
+                                    <div class="text-center"><a data-product="{{product.id}}" data-action="add" class="btn btn-outline-dark mt-auto add-btn update-cart">Add to Cart</a></div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -90,7 +108,7 @@
     </footer>
     <!-- Bootstrap core JS-->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Core theme JS-->
-    <script src="js/scripts.js"></script>
+    
+    <script type="text/javascript" src="{% static 'storeapp/js/cart.js' %}"></script>
     </body>
 </html>

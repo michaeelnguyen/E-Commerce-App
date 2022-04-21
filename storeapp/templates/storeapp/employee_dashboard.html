@@ -20,7 +20,7 @@
 		<h5>CUSTOMERS</h5>
 		<hr>
 		<div class="card card-body">
-			<a class="btn btn-sm btn-primary" href="{% url 'create_customer' %}">Create Customer</a>
+			<a class="btn btn-sm btn-primary" href="">Create Customer</a>
 			
 			<table class="table table-sm">
 				<tr>
@@ -34,8 +34,8 @@
 						<td>{{customer.customer_First_Name}} {{customer.customer_Last_Name}}</td>
 						<td>{{customer.customer_Email}}</td>
 						<td>{{customer.customer_Phone_Number}}</td>
-						<td><a class="btn btn-sm btn-primary" href="{% url 'customer_dashboard' customer.id %}">View</a></td>
-						<td><a class="btn btn-sm btn-primary" href="{% url 'update_customer' customer.id %}">Update</a></td>
+						<td><a class="btn btn-sm btn-primary" href="">View</a></td>
+						<td><a class="btn btn-sm btn-primary" href="">Update</a></td>
 					</tr>
 				{% endfor %}
 
@@ -55,6 +55,7 @@
 				</tr>
 
 				{% for order in orders %}
+					{% if order.complete %}
 					<tr>
 						<td>{{order.product}}</td>
 						<td>{{order.date_created}}</td>
@@ -63,14 +64,16 @@
 						<td><a class="btn btn-sm btn-danger" href="{% url 'delete_order' order.id %}">Cancel</a></td>
 
 					</tr>
+					{% endif %}
 				{% endfor %}
 
 		
 			</table>
 		</div>
 	</div>
-
+	
 	<div class="col-md-5">
+		<br>
 		<h5>PRODUCTS</h5>
 		<hr>
 		<div class="card card-body">
@@ -78,14 +81,18 @@
 			
 			<table class="table table-sm">
 				<tr>
+					<th>SKU</th>
 					<th>Product</th>
 					<th>Version</th>
-					<th>Stock</th>
 					<th>Price</th>
+					<th>Stock</th>
+					
+
 				</tr>
 
 				{% for product in products %}
 					<tr>
+						<td>{{product.id}}</td>
 						<td>{{product.product_Name}}</td>
 						<td>{{product.version_ID}}</td>
 						<td>{{product.product_Stock}}</td>

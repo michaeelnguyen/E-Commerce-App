@@ -41,8 +41,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'bootstrap5',
-    'storeapp',
-    'basket',
+    #'storeapp',
+    'storeapp.apps.StoreappConfig',
+    #'basket',
     'django_filters',
 ]
 
@@ -71,7 +72,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'basket.context_processors.basket',
+                #'basket.context_processors.basket',
             ],
         },
     },
@@ -92,7 +93,7 @@ DATABASES = {
     
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'pliableplasticproduction',
+        'NAME': 'pliableplasticsproduction',
         'USER': 'postgres',
         'PASSWORD': 'password',
         'HOST': 'localhost',
@@ -144,12 +145,21 @@ STATICFILES_DIRS = [
 
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'static/media')
 MEDIAFILES_DIRS = [
-    os.path.join(BASE_DIR,'media/storeapp'),
+    os.path.join(BASE_DIR,'storeapp/media'),
 
 ]
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+''' 
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = '*********'
+EMAIL_HOST_PASSWORD = '*********' 
+'''

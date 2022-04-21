@@ -1,49 +1,59 @@
+from django.conf import settings
 from django.db import models
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
+from django.contrib.auth.models import User
 
 # Create your models here.
 
 class Customer(models.Model):
-    #customer_Username = models.CharField(max_length=255, unique=True)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
 
-    customer_First_Name = models.CharField(max_length=255, null=True)
-    customer_Last_Name = models.CharField(max_length=255, null=True)
-    customer_Phone_Number= models.CharField(max_length=255, null=True)
+    customer_First_Name = models.CharField(max_length=255, blank=True)
+    customer_Last_Name = models.CharField(max_length=255, blank=True)
+    customer_Phone_Number= models.CharField(max_length=255, blank=True)
 
-    customer_Email = models.EmailField(max_length=255, null=True)
-    customer_Password= models.CharField(max_length=255, null=True)
-    street_Address = models.CharField(max_length=255, null=True)
-    city = models.CharField(max_length=255, null=True)
-    state = models.CharField(max_length=255, null=True)
-    zip = models.CharField(max_length=255, null=True)
+    customer_Email = models.EmailField(max_length=255, blank=True)
 
-    slug = models.SlugField(max_length=255, null=True)
-    date_created = models.DateTimeField(auto_now_add=True, null=True)
+    #street_Address = models.CharField(max_length=255, null=True)
+    #city = models.CharField(max_length=255, null=True)
+    #state = models.CharField(max_length=255, null=True)
+    #zip = models.CharField(max_length=255, null=True)
+
+    slug = models.SlugField(max_length=255, blank=True)
+    date_created = models.DateTimeField(auto_now_add=True, blank=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
 
+    class Meta:
+        ordering = ['customer_Last_Name']
+
     def save(self, *args, **kwargs):
-        self.slug = slugify(self.customer_First_Name + " " + self.customer_Last_Name)
+        self.slug = slugify(self.user)
         super(Customer, self).save(*args, **kwargs)
 
     def __str__(self):
-        return self.customer_First_Name + " " + self.customer_Last_Name
+        return self.customer_First_Name + ' ' + self.customer_Last_Name
 
 
 class Employee(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
+
     employee_First_Name = models.CharField(max_length=255, null=True)
     employee_Last_Name = models.CharField(max_length=255, null=True)
     employee_Phone_Number= models.CharField(max_length=255, null=True)
     employee_Email = models.EmailField(max_length=255, null=True)
-    employee_Password= models.CharField(max_length=255, null=True)
+
     role = models.CharField(max_length=255, null=True)
 
     slug = models.SlugField(max_length=255, null=True)
     date_created = models.DateTimeField(auto_now_add=True, null=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['employee_Last_Name']
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.employee_First_Name + " " + self.employee_Last_Name)
@@ -59,6 +69,9 @@ class Vendor(models.Model):
     slug = models.SlugField(max_length=255, null=True)
     date_created = models.DateTimeField(auto_now_add=True, null=True)
     is_active = models.BooleanField(default=True)
+    
+    class Meta:
+        ordering = ['vendor_name']
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.vendor_name)
@@ -74,6 +87,9 @@ class Expediter(models.Model):
     slug = models.SlugField(max_length=255, null=True)
     date_created = models.DateTimeField(auto_now_add=True, null=True)
     is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['expediter_name']
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.expediter_name)
@@ -99,6 +115,9 @@ class Material(models.Model):
     slug = models.SlugField(max_length=255, null=True)
     date_created = models.DateTimeField(auto_now_add=True, null=True)
     is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['material_Type']
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.material_Type)
@@ -179,6 +198,7 @@ class Category(models.Model):
 
     class Meta:
         verbose_name_plural = "Categories"
+        ordering = ['category_Name']
     
     def save(self, *args, **kwargs):
         self.slug = slugify(self.category_Name)
@@ -207,12 +227,23 @@ class Product(models.Model):
     date_created = models.DateTimeField(auto_now_add=True, null=True)
     is_active = models.BooleanField(default=True)
 
+    class Meta:
+        ordering = ['product_Name']
+
     def __str__(self):
-        return f'{self.product_Name} --- DIMENSIONS ({self.height} x {self.width} x {self.width}) --- PRICE ${self.product_Price}'
+        return f'{self.product_Name}'
+    
+    @property
+    def imageURL(self):
+        try:
+            url = self.version_ID.product_Image.url
+        except:
+            url = ''
+        return url
 
 
 class Billing(models.Model):
-    #customer = models.ForeignKey(Customer, null=True, on_delete=models.SET_NULL)
+    customer = models.ForeignKey(Customer, null=True, on_delete=models.SET_NULL)
     billing_Address = models.CharField(max_length=255, null=True)
     billing_City = models.CharField(max_length=255, null=True)
     billing_State = models.CharField(max_length=255, null=True)
@@ -237,8 +268,70 @@ class Billing(models.Model):
         return f'ADDRESS: {self.billing_Address}, {self.billing_City}, {self.billing_State}, {self.billing_Zip} -- DATE BILLED: {self.date_Billed.strftime("%d.%m.%Y")}'
 
 
+class Order(models.Model):
+    STATUS = (
+        ('Pending', 'Pending'),
+        ('Shipped', 'Shipped'),
+        ('Out for Delivery', 'Out for Delivery'),
+        ('Delivered', 'Delivered'),
+    )
+
+    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
+    product = models.ForeignKey(Product, null=True, on_delete=models.SET_NULL)
+
+    order_Date = models.DateTimeField(auto_now_add=True, null=True)
+    complete = models.BooleanField(default=False, null=True, blank=False)
+    order_Status = models.CharField(max_length=255, null=True, blank=True, choices=STATUS)
+    confirmation_Number = models.CharField(max_length=255, null=True)
+    
+
+    billing_ID = models.ForeignKey(Billing, null=True, on_delete=models.SET_NULL)
+    #shipment_ID = models.ForeignKey(Shipping, null=True, on_delete=models.SET_NULL)
+    subtotal = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+    total = models.DecimalField(max_digits=12, decimal_places=2, null=True) 
+    
+    date_created = models.DateTimeField(auto_now_add=True, null=True)
+    is_active = models.BooleanField(default=True)
+    
+    class Meta: 
+        ordering = ['order_Date']
+    
+    @property
+    def get_cart_total(self):
+        orderitems = self.orderitem_set.all()
+        total = sum([item.get_total for item in orderitems])
+        return total
+    
+    @property
+    def get_cart_items(self):
+        orderitems = self.orderitem_set.all()
+        total = sum([item.quantity for item in orderitems])
+        return total
+
+    def __str__(self):
+        return f'Order Number: {self.confirmation_Number} , Order Date: {self.order_Date.strftime("%d.%m.%Y")}, STATUS: {self.order_Status}'
+
+
+
+class OrderItem(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
+    order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
+    quantity = models.IntegerField(default=0, null=True, blank=True)
+    date_added = models.DateTimeField(auto_now_add=True)
+
+    @property
+    def get_total(self):
+        total = self.product.product_Price * self.quantity
+        return total
+    
+    def __str__(self):
+        return f'{self.product.product_Name}'
+
+
 class Shipping(models.Model):
-    #customer = models.ForeignKey(Customer, null=True, on_delete=models.SET_NULL)
+    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
+    order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
+    
     shipping_Address = models.CharField(max_length=255, null=True)
     shipping_City = models.CharField(max_length=255, null=True)
     shipping_State = models.CharField(max_length=255, null=True)
@@ -259,35 +352,7 @@ class Shipping(models.Model):
         ordering = ['date_Shipped']
     
     def __str__(self):
-        return f'ADDRESS: {self.shipping_Address}, {self.shipping_City}, {self.shipping_State}, {self.shipping_Zip} -- DATE SHIPPED: {self.date_Shipped.strftime("%d.%m.%Y")}'
-
-
-class Order(models.Model):
-    STATUS = (
-        ('Pending', 'Pending'),
-        ('Shipped', 'Shipped'),
-        ('Out for Delivery', 'Out for Delivery'),
-        ('Delivered', 'Delivered'),
-    )
-
-    customer = models.ForeignKey(Customer, null=True, on_delete=models.SET_NULL)
-    product = models.ForeignKey(Product, null=True, on_delete=models.SET_NULL)
-
-    order_Date = models.DateTimeField(auto_now_add=True, null=True)
-    order_Status = models.CharField(max_length=255, null=True, choices=STATUS)
-    
-    confirmation_Number = models.CharField(max_length=255, null=True)
-    billing_ID = models.ForeignKey(Billing, null=True, on_delete=models.SET_NULL)
-    shipment_ID = models.ForeignKey(Shipping, null=True, on_delete=models.SET_NULL)
-    subtotal = models.DecimalField(max_digits=12, decimal_places=2, null=True)
-    total = models.DecimalField(max_digits=12, decimal_places=2, null=True) 
-    
-    date_created = models.DateTimeField(auto_now_add=True, null=True)
-    is_active = models.BooleanField(default=True)
-    
-    class Meta: 
-        ordering = ['order_Date']
-
-    def __str__(self):
-        return f'Order Number: {self.confirmation_Number} , Order Date: {self.order_Date.strftime("%d.%m.%Y")}, STATUS: {self.order_Status}'
-
+        if self.date_Shipped == None:
+            return f'ADDRESS: {self.shipping_Address}, {self.shipping_City}, {self.shipping_State}, {self.shipping_Zip} -- DATE BILLED: NOT PROCESSED'
+   
+        return f'ADDRESS: {self.shipping_Address}, {self.shipping_City}, {self.shipping_State}, {self.shipping_Zip} -- DATE BILLED: {self.date_Shipped.strftime("%d.%m.%Y")}'

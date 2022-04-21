@@ -105,53 +105,19 @@
                                 <div class="input-group-append">
                                     <span class="input-group-text"><i class="fas fa-user"></i></span>
                                 </div>
-                                <input type="text" name="customer_First_Name">
+                                {{form.first_name}}
                             </div>
                             <div class="input-group mb-4">
                                 <div class="input-group-append">
                                     <span class="input-group-text"><i class="fas fa-user"></i></span>
                                 </div>
-                                <input type="text" name="customer_Last_Name">
+                                {{form.last_name}}
                             </div>
-
-
-                            <div class="input-group mb-2">
-                                <div class="input-group-append">
-                                    <span class="input-group-text"><i class="fas fa-city"></i></span>
-                                </div>
-                                <input type="text" name="street_address">
-                            </div>
-                            <div class="input-group mb-2">
-                                <div class="input-group-append">
-                                    <span class="input-group-text"><i class="fas fa-city"></i></span>
-                                </div>
-                                <input type="text" name="city">
-                            </div>
-                            <div class="input-group mb-2">
-                                <div class="input-group-append">
-                                    <span class="input-group-text"><i class="fas fa-city"></i></span>
-                                </div>
-                                <input type="text" name="state">
-                            </div>
-                            <div class="input-group mb-4">
-                                <div class="input-group-append">
-                                    <span class="input-group-text"><i class="fas fa-city"></i></span>
-                                </div>
-                                <input type="text" name="zip">
-                            </div>
-
-
-                            <div class="input-group mb-2">
-                                <div class="input-group-append">
-                                    <span class="input-group-text"><i class="fas fa-phone-square"></i></span>
-                                </div>
-                                <input type="text" name="customer_Phone_Number">
-                            </div>
+                            
                             <div class="input-group mb-4">
                                 <div class="input-group-append">
                                     <span class="input-group-text"><i class="fas fa-envelope-square"></i></span>
                                 </div>
-                                {{form.email.label}}
                                 {{form.email}}
                             </div>
 
@@ -160,14 +126,12 @@
                                 <div class="input-group-append">
                                     <span class="input-group-text"><i class="fas fa-user"></i></span>
                                 </div>
-                                {{form.username.label}}
                                 {{form.username}}
                             </div>
                             <div class="input-group mb-2">
                                 <div class="input-group-append">
                                     <span class="input-group-text"><i class="fas fa-key"></i></span>
                                 </div>
-                                {{form.password1.label}}
                                 {{form.password1}}
                                 
                             </div>
@@ -175,7 +139,6 @@
                                 <div class="input-group-append">
                                     <span class="input-group-text"><i class="fas fa-key"></i></span>
                                 </div>
-                                {{form.password2.label}}
                                 {{form.password2}}
                             </div>
 
@@ -185,6 +148,7 @@
                         </form>
                     </div>
             
+                    {{form.errors}}
                     <div class="mt-4">
                         <div class="d-flex justify-content-center links text-white">
                             Already have an account? <a href="{% url 'login' %}" class="ml-2">Login</a>
@@ -202,18 +166,11 @@
             var form_fields = document.getElementsByTagName('input')
             form_fields[1].placeholder='First Name';
             form_fields[2].placeholder='Last Name';
-            form_fields[3].placeholder='Street Address';
-            form_fields[4].placeholder='City';
-            form_fields[5].placeholder='State';
-            form_fields[6].placeholder='Zip Code';
-            
+            form_fields[3].placeholder='Email';
 
-            form_fields[7].placeholder='Phone Number';
-            form_fields[8].placeholder='Email';
-
-            form_fields[9].placeholder='User Name';
-            form_fields[10].placeholder='Enter Password...';
-            form_fields[11].placeholder='Re-enter Password...';
+            form_fields[4].placeholder='User Name';
+            form_fields[5].placeholder='Enter Password...';
+            form_fields[6].placeholder='Re-enter Password...';
 
 
             for (var field in form_fields){	

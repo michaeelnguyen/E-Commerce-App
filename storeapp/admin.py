@@ -3,7 +3,7 @@ from django.contrib import admin
 # Register your models here.
 
 from .models import Customer, Employee, Vendor, Expediter, Material, Version, InputItem, Machine 
-from .models import Job, Category, Product, Billing, Shipping, Order
+from .models import Job, Category, Product, Billing, Shipping, Order, OrderItem
 
 admin.site.register(Customer)
 admin.site.register(Employee)
@@ -21,3 +21,4 @@ admin.site.register(Product)
 admin.site.register(Billing)
 admin.site.register(Shipping)
 admin.site.register(Order)
+admin.site.register(OrderItem)
