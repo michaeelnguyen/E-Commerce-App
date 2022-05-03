@@ -16,7 +16,7 @@ urlpatterns = [
 
     
     path('shop/', storeapp_views.productListing, name="productListing"),
-    path('shoppingCart/', storeapp_views.shoppingCart, name="shoppingCart"),
+    path('cart/', storeapp_views.shoppingCart, name="shoppingCart"),
     path('checkout/', storeapp_views.checkout, name="checkout"),
     
     path('update_item/', storeapp_views.updateItem, name="update_item"),
@@ -26,18 +26,38 @@ urlpatterns = [
 
 
     path('admin_dashboard/', storeapp_views.employee_dashboard, name="employee_dashboard"),
-    #path('dashboard/<str:pk>/', storeapp_views.customer_dashboard, name="customer_dashboard"),
+    
     path('dashboard/', storeapp_views.customer_dashboard, name="customer_dashboard"),
+    path('dashboard/<str:pk>/', storeapp_views.customer_dashboard, name="customer_dashboard2"),
 
     path('create_order/<str:pk>/', storeapp_views.createOrder, name="create_order"),
     path('update_order/<str:pk>/', storeapp_views.updateOrder, name="update_order"),
     path('delete_order/<str:pk>/', storeapp_views.deleteOrder, name="delete_order"),
 
     #path('create_customer/', storeapp_views.createCustomer, name="create_customer"),
-    path('update_customer/', storeapp_views.updateCustomer, name="update_customer"),
+    path('update_customer/', storeapp_views.accountSettings, name="update_customer"),
+    path('update_customer/<str:pk>/', storeapp_views.updateCustomer, name="update_customer2"),
 
     path('create_product/', storeapp_views.createProduct, name="create_product"),
     path('update_product/<str:pk>/', storeapp_views.updateProduct, name="update_product"),
+
+
+    path('create_job/', storeapp_views.createJob, name="create_job"),
+    path('update_job/<str:pk>/', storeapp_views.updateJob, name="update_job"),
+
+    path('create_version/', storeapp_views.createVersion, name="create_version"),
+    path('update_version/<str:pk>/', storeapp_views.updateVersion, name="update_version"),
+
+    path('create_machine/', storeapp_views.createMachine, name="create_machine"),
+    path('update_machine/<str:pk>/', storeapp_views.updateMachine, name="update_machine"),
+
+    path('create_input/', storeapp_views.createInput, name="create_input"),
+    path('update_input/<str:pk>/', storeapp_views.updateInput, name="update_input"),
+
+
+    path('create_custom_version/', storeapp_views.createCustomVersion, name="create_custom_version"),
+    path('create_custom_product/', storeapp_views.createCustomProduct, name="create_custom_product"),
+
 
 
 

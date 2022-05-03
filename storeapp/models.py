@@ -128,10 +128,12 @@ class Material(models.Model):
 
 
 class Version(models.Model):
+    #product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
+    
     product_Image = models.ImageField(upload_to='media/storeapp/product_images', null=True, blank=True)
-    product_Version = models.CharField(max_length=255, null=True)
-    product_Version_Date = models.DateTimeField(auto_now_add=False, null=True)
-    product_Design_File = models.FileField(upload_to='media/storeapp/product_files', null=True)
+    product_Version = models.CharField(max_length=255, null=True, blank=True)
+    product_Version_Date = models.DateTimeField(auto_now_add=False, null=True, blank=True)
+    product_Design_File = models.FileField(upload_to='media/storeapp/product_files', null=True, blank=True)
     product_Comments = models.TextField(null=True, blank=True)
 
     date_created = models.DateTimeField(auto_now_add=True, null=True)
@@ -145,32 +147,17 @@ class InputItem(models.Model):
     input_Name = models.CharField(max_length=255, null=True)
     quantity_Per_1000_Units = models.PositiveIntegerField(null=True)
     message_Commands = models.TextField(null=True, blank=True)
-
     vendor = models.ForeignKey(Vendor, null=True, on_delete=models.SET_NULL)
+    
     date_created = models.DateTimeField(auto_now_add=True, null=True)
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return f'{self.input_Name} / QTY: {self.quantity_Per_1000_Units}'
 
-
-class Machine(models.Model):
-    machine_Number = models.PositiveIntegerField(null=True)
-    input_ID = models.ManyToManyField(InputItem, related_name='inputs')
-    #input_ID = models.ForeignKey(InputItem, null=True, on_delete=models.SET_NULL)
-
-    date_created = models.DateTimeField(auto_now_add=True, null=True)
-    is_active = models.BooleanField(default=True)
-
-    class Meta:
-        ordering = ['machine_Number']
-
-    def __str__(self):
-        return f' Machine #{self.machine_Number}'
-
 class Job(models.Model):
 
-    machine_ID = models.ForeignKey(Machine, null=True, on_delete=models.SET_NULL)
+    #machine_ID = models.ForeignKey(Machine, null=True, on_delete=models.SET_NULL, blank=True)
     employee = models.ForeignKey(Employee, null=True, on_delete=models.SET_NULL)
     start_Time = models.DateTimeField(auto_now_add=False, null=True)
     end_Time = models.DateTimeField(auto_now_add=False, null=True, blank=True)
@@ -187,6 +174,21 @@ class Job(models.Model):
         if self.end_Time == None:
             return f'[START TIME: {self.start_Time}] [END TIME: IN PROGRESS...]'
         return f'[START TIME: {self.start_Time}] [END TIME: {self.end_Time}]'
+
+
+class Machine(models.Model):
+    job = models.ForeignKey(Job, null=True, on_delete=models.SET_NULL, blank=True)
+    machine_Number = models.PositiveIntegerField(null=True)
+    input = models.ManyToManyField(InputItem, related_name='inputs')
+    
+    date_created = models.DateTimeField(auto_now_add=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['machine_Number']
+
+    def __str__(self):
+        return f' Machine #{self.machine_Number}'
 
 
 class Category(models.Model):
@@ -207,6 +209,7 @@ class Category(models.Model):
     def __str__(self):
         return self.category_Name
 
+
 class Product(models.Model):
     product_Name = models.CharField(max_length=255, null=True)
     product_Description = models.CharField(max_length=255, null=True)
@@ -219,7 +222,7 @@ class Product(models.Model):
 
     category_ID = models.ForeignKey(Category, on_delete=models.RESTRICT)
     material_ID = models.ForeignKey(Material, null=True, on_delete=models.DO_NOTHING)
-    version_ID = models.ForeignKey(Version, related_name='versionList', null=False, on_delete=models.DO_NOTHING)
+    version_ID = models.ForeignKey(Version, related_name='versionList', null=True, on_delete=models.DO_NOTHING, blank=True)
     job_ID = models.ForeignKey(Job, null=True, on_delete=models.DO_NOTHING)
     
     is_custom = models.BooleanField(default=False)
@@ -241,53 +244,24 @@ class Product(models.Model):
             url = ''
         return url
 
-
-class Billing(models.Model):
-    customer = models.ForeignKey(Customer, null=True, on_delete=models.SET_NULL)
-    billing_Address = models.CharField(max_length=255, null=True)
-    billing_City = models.CharField(max_length=255, null=True)
-    billing_State = models.CharField(max_length=255, null=True)
-    billing_Zip = models.CharField(max_length=255, null=True)
-    
-    date_Billed = models.DateTimeField(auto_now_add=False, null=True, blank=True)
-    #card_Number =
-    #expiration_Date = 
-    #security_Code = 
-
-    date_created = models.DateTimeField(auto_now_add=True, null=True)
-    is_active = models.BooleanField(default=True)
-
-    class Meta:
-        verbose_name_plural = "Billing"
-        ordering = ['date_Billed']
-    
-    def __str__(self):
-        if self.date_Billed == None:
-            return f'ADDRESS: {self.billing_Address}, {self.billing_City}, {self.billing_State}, {self.billing_Zip} -- DATE BILLED: NOT PROCESSED'
-   
-        return f'ADDRESS: {self.billing_Address}, {self.billing_City}, {self.billing_State}, {self.billing_Zip} -- DATE BILLED: {self.date_Billed.strftime("%d.%m.%Y")}'
-
-
 class Order(models.Model):
     STATUS = (
         ('Pending', 'Pending'),
         ('Shipped', 'Shipped'),
         ('Out for Delivery', 'Out for Delivery'),
         ('Delivered', 'Delivered'),
+        ('Canceled', 'Canceled'),
     )
 
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
-    product = models.ForeignKey(Product, null=True, on_delete=models.SET_NULL)
+    #product = models.ForeignKey(Product, null=True, on_delete=models.SET_NULL)
 
     order_Date = models.DateTimeField(auto_now_add=True, null=True)
     complete = models.BooleanField(default=False, null=True, blank=False)
     order_Status = models.CharField(max_length=255, null=True, blank=True, choices=STATUS)
     confirmation_Number = models.CharField(max_length=255, null=True)
     
-
-    billing_ID = models.ForeignKey(Billing, null=True, on_delete=models.SET_NULL)
-    #shipment_ID = models.ForeignKey(Shipping, null=True, on_delete=models.SET_NULL)
-    subtotal = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+    #subtotal = models.DecimalField(max_digits=12, decimal_places=2, null=True)
     total = models.DecimalField(max_digits=12, decimal_places=2, null=True) 
     
     date_created = models.DateTimeField(auto_now_add=True, null=True)
@@ -328,6 +302,31 @@ class OrderItem(models.Model):
         return f'{self.product.product_Name}'
 
 
+class Billing(models.Model):
+    customer = models.ForeignKey(Customer, null=True, on_delete=models.SET_NULL)
+    order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
+    
+    billing_Address = models.CharField(max_length=255, null=True)
+    billing_City = models.CharField(max_length=255, null=True)
+    billing_State = models.CharField(max_length=255, null=True)
+    billing_Zip = models.CharField(max_length=255, null=True)
+    
+    date_Billed = models.DateTimeField(auto_now_add=False, null=True, blank=True)
+
+    date_created = models.DateTimeField(auto_now_add=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        verbose_name_plural = "Billing"
+        ordering = ['date_Billed']
+    
+    def __str__(self):
+        if self.date_Billed == None:
+            return f'{self.billing_Address}, {self.billing_City}, {self.billing_State}, {self.billing_Zip} -- DATE BILLED: NOT PROCESSED'
+   
+        return f'{self.billing_Address}, {self.billing_City}, {self.billing_State}, {self.billing_Zip} -- DATE BILLED: {self.date_Billed.strftime("%d.%m.%Y")}'
+
+
 class Shipping(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
     order = models.ForeignKey(Order, on_delete=models.SET_NULL, null=True)
@@ -353,6 +352,6 @@ class Shipping(models.Model):
     
     def __str__(self):
         if self.date_Shipped == None:
-            return f'ADDRESS: {self.shipping_Address}, {self.shipping_City}, {self.shipping_State}, {self.shipping_Zip} -- DATE BILLED: NOT PROCESSED'
+            return f'{self.shipping_Address}, {self.shipping_City}, {self.shipping_State}, {self.shipping_Zip} -- DATE BILLED: NOT PROCESSED'
    
-        return f'ADDRESS: {self.shipping_Address}, {self.shipping_City}, {self.shipping_State}, {self.shipping_Zip} -- DATE BILLED: {self.date_Shipped.strftime("%d.%m.%Y")}'
+        return f'{self.shipping_Address}, {self.shipping_City}, {self.shipping_State}, {self.shipping_Zip} -- DATE BILLED: {self.date_Shipped.strftime("%d.%m.%Y")}'

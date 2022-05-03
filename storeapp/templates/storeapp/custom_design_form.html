@@ -1,0 +1,206 @@
+{%  include 'storeapp/base.html' %}
+
+<style>        
+    .box-element{
+        box-shadow:hsl(0, 0%, 80%) 0 0 16px;
+        background-color: #fff;
+        border-radius: 4px;
+        padding: 50px;
+    }
+    
+    .form-field{
+        width:500px;
+        padding: 5px;
+    }
+    
+    .cart-row{
+        display: flex;
+        align-items: flex-stretch;
+        padding-bottom: 10px;
+        margin-bottom: 10px;
+        border-bottom: 1px solid #ececec;
+    
+    }
+    
+    .hidden{
+        display: none!important;
+    }
+</style>
+
+{% block content %}
+
+<!-- Header-->
+<header class="bg-dark py-5">
+    <div class="container px-4 px-lg-5 my-5">
+        <div class="text-center text-white">
+            <h1 class="display-4 fw-bolder">Pliable Plastic Production</h1>
+            <p class="lead fw-normal text-white-50 mb-0">Custom Design</p>
+        </div>
+    </div>
+</header>
+
+<div class="container px-4 px-lg-5 mt-5">
+    <h1 class="display-10 fw-bolder">Product Design Form</h1>
+    <p>* Please fill out Product/Design Information and upload CAD/CAM file.</p>
+    <br>
+
+        <div id="form-wrapper">
+            <form id="form">
+                <div class="row gx-4 gx-lg-5 row-cols-3 row-cols-md-3 row-cols-xl-3">
+                    <div class="card card-body row-cols-1 m-2">
+                        
+                        <div class="col mb-5" id="product-info">
+                            <hr>
+                            <h2><strong>Product Information: </strong></h2>
+                            <hr>
+                            <div class="form-field">
+                                <input class="form-control" type="text" name="product_name" placeholder="Product Name">
+                            </div>
+                            <div class="form-field">
+                                <input class="form-control" type="text" name="product_desc" placeholder="Product Description">
+                            </div>
+                            <div class="form-field">
+                                <br>
+                                <label for="dimensions"><h4>Enter Product Dimensions:</h4></label>
+                                <hr>
+                                <input class="form-control" type="text" name="height" placeholder="Height">
+                            </div>
+                            <div class="form-field">
+                                <input class="form-control" type="text" name="width" placeholder="Width">
+                            </div>
+                            <div class="form-field">
+                                <input class="form-control" type="text" name="depth" placeholder="Depth">
+                            </div>
+                            <div class="form-field">
+                                <br>
+                                <label for="category"><h4>Choose Product Category:</h4></label>
+                                <hr>
+                                    <select class="form-control" name="category">
+                                        <option value="bottles">Bottles</option>
+                                        <option value="containers">Containers</option>
+                                        <option value="films">Films</option>
+                                        <option value="packaging">Packaging</option>
+                                        <option value="parts">Parts</option>
+                                        <option value="rods">Rods</option>
+                                        <option value="sheets">Sheets</option>
+                                        <option value="tubing">Tubing</option>
+                                    </select>
+                            </div>
+                            <div class="form-field">
+                                <br>
+                                <label for="material_type"><h4>Choose Material Type:</h4></label>
+                                <hr>
+                                    <select class="form-control" name="material_type">
+                                        <option value="pmma">Acrylic/Polymethyl Methacrylate (PMMA)</option>
+                                        <option value="pc">Polycarbonate (PC)</option>
+                                        <option value="pe">Polyethlene (PE)</option>
+                                        <option value="pp">Polypropylene (PP)</option>
+                                        <option value="pet">Polyethylene Terephthalate (PET)</option>
+                                        <option value="pvc">Polyvinyl Chloride (PVC)</option>
+                                        <option value="abs">Acrylonitrile-Butadiene-Stryrene (ABS)</option>
+                                    </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card card-body row-cols-1 m-2">
+                        <div id="version-info">
+                            <hr>
+                            <h2><strong>Version Information: </strong></h2>
+                            <hr>
+                            <div class="form-field">
+                                <input class="form-control" type="text" name="version_number" placeholder="Version Number">
+                            </div>
+                            <div class="form-field">
+                                <label for="version_date"><h4>Enter Version Design Date:</h4></label>
+                                <input class="form-control" type="datetime-local" name="version_date">
+                            </div>
+                            <div class="form-field">
+                                <label for="dimensions"><h4>Upload CAD/CAM Design File</h4></label>
+                                <input class="form-control" type="file" name="design_file" placeholder="Design File">
+                            </div>
+                            <div class="form-field">
+                                <label for="dimensions"><h4>Enter Quantity Per 1000 Units</h4></label>
+                                <input class="form-control" type="number" min="1" max= "100" name="quantity">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <hr>
+                <button class="btn btn-primary btn-block" id="create-design">Submit</button>
+                
+            </form>
+        </div>
+</div>
+        
+
+
+<script type="text/javascript">
+    if (user != 'AnonymousUser'){
+        document.getElementById('user-info').innerHTML = ''
+    }
+
+    var form = document.getElementById('form')
+    
+    form.addEventListener('submit', function(e){
+        e.preventDefault()
+        console.log('Form Submitted...')
+        document.getElementById('form-button').classList.add("hidden");
+        document.getElementById('payment-info').classList.remove("hidden");
+    })
+
+    document.getElementById('create-design').addEventListener('click', function(e){
+        submitFormData()
+    })
+    
+    function submitFormData(){
+        console.log('Submit Design Form button clicked')
+
+        var productInfo = {
+            'name':null,
+            'description':null,
+            'height':null,
+            'width':null,
+            'depth':null,
+            'category':null,
+            'material':null,
+        }
+
+        var versionInfo = {
+            'number':null,
+            'date':null,
+            'state':null,
+            'zipcode':null,
+        }
+        
+        console.log('Shipping Info:', productInfo)
+        console.log('Billing Info:', versionInfo)
+
+        var url = '/create_custom_order/'
+        fetch(url,{
+            method:'POST',
+            headers:{
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken,
+
+            },
+            body:JSON.stringify({'product': productInfo, 'version': versionInfo}),
+        })
+        .then((response) => response.json())
+	    	.then((data) => {
+				console.log('Success:', data);
+				alert('Transaction completed');  
+
+                cart = {}
+                document.cookie ='cart=' + JSON.stringify(cart) + ";domain=;path=/"
+                
+				window.location.href = "{% url 'productListing' %}"
+
+			})
+    }
+
+</script>
+
+{% endblock content %}

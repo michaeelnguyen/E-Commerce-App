@@ -16,7 +16,7 @@
 <br>
 
 <div class="row">
-	<div class="col-md-5">
+	<div class="col-md-6 p-4">
 		<h5>CUSTOMERS</h5>
 		<hr>
 		<div class="card card-body">
@@ -27,6 +27,8 @@
 					<th>Customer</th>
 					<th>Email</th>
 					<th>Phone</th>
+					<!-- <th>Profile</th> -->
+					<th>Update</th>
 				</tr>
 
 				{% for customer in customers %}
@@ -34,8 +36,8 @@
 						<td>{{customer.customer_First_Name}} {{customer.customer_Last_Name}}</td>
 						<td>{{customer.customer_Email}}</td>
 						<td>{{customer.customer_Phone_Number}}</td>
-						<td><a class="btn btn-sm btn-primary" href="">View</a></td>
-						<td><a class="btn btn-sm btn-primary" href="">Update</a></td>
+						<!--	<td><a class="btn btn-sm btn-primary" href="{% url 'customer_dashboard2' customer.id %}">View</a></td>	-->
+						<td><a class="btn btn-sm btn-primary" href="{% url 'update_customer2' customer.id %}">Update</a></td>
 					</tr>
 				{% endfor %}
 
@@ -43,36 +45,38 @@
 		</div>
 	</div>
 
-	<div class="col-md-7">
+	<div class="col-md-6 p-4">
 		<h5>LAST 5 ORDERS</h5>
 		<hr>
 		<div class="card card-body">
 			<table class="table table-sm">
 				<tr>
 					<th>Product</th>
+					<th>Confirmation #</th>
 					<th>Date Ordered</th>
 					<th>Status</th>
 				</tr>
 
-				{% for order in orders %}
-					{% if order.complete %}
+					{% for item in order_items %}
+					{% if item.order.complete %}
 					<tr>
-						<td>{{order.product}}</td>
-						<td>{{order.date_created}}</td>
-						<td>{{order.order_Status}}</td>
-						<td><a class="btn btn-sm btn-primary" href="{% url 'update_order' order.id %}">Update</a></td>
-						<td><a class="btn btn-sm btn-danger" href="{% url 'delete_order' order.id %}">Cancel</a></td>
+						<td>{{item}}</td>
+						<td>{{item.order.confirmation_Number}}</td>
+						<td>{{item.order.date_created}}</td>
+						<td>{{item.order.order_Status}}</td>
+						<td><a class="btn btn-sm btn-primary" href="{% url 'update_order' item.order.id %}">Update</a></td>
+						<td><a class="btn btn-sm btn-danger" href="{% url 'delete_order' item.order.id %}">Cancel</a></td>
 
 					</tr>
 					{% endif %}
-				{% endfor %}
+					{% endfor %}
 
 		
 			</table>
 		</div>
 	</div>
 	
-	<div class="col-md-5">
+	<div class="col-md-6 p-4">
 		<br>
 		<h5>PRODUCTS</h5>
 		<hr>
@@ -105,6 +109,118 @@
 			</table>
 		</div>
 	</div>
+
+	<div class="col-md-6 p-4">
+		<br>
+		<h5>VERSIONS</h5>
+		<hr>
+		<div class="card card-body">
+			<a class="btn btn-sm btn-primary" href="{% url 'create_version' %}">Create Version</a>
+			
+			<table class="table table-sm">
+				<tr>
+					<th>Version</th>
+					<th>Version Date</th>
+				</tr>
+
+				{% for ver in versions %}
+					<tr>
+						<td>{{ver.product_Version}}</td>
+						<td>{{ver.product_Version_Date}}</td>
+						<td>{{ver.start_Time}}</td>
+						<td>{{ver.end_Time}}</td>
+						<td><a class="btn btn-sm btn-primary" href="{% url 'update_version' ver.id %}">Update</a></td>
+					</tr>
+				{% endfor %}
+
+			</table>
+		</div>
+	</div>
+
+	<div class="col-md-6 p-4">
+		<br>
+		<h5>JOBS</h5>
+		<hr>
+		<div class="card card-body" style="height:1150px; width:auto;">
+			<a class="btn btn-sm btn-primary" href="{% url 'create_job' %}">Create Job</a>
+			
+			<table class="table table-sm">
+				<tr>
+					<th>Job Number</th>
+					<th>Employee</th>
+					<th>Start Time</th>
+					<th>End Time</th>
+					
+
+				</tr>
+
+				{% for job in jobs %}
+					<tr>
+						<td>{{job.id}}</td>
+						<td>{{job.employee}}</td>
+						<td>{{job.start_Time}}</td>
+						<td>{{job.end_Time}}</td>
+						<td><a class="btn btn-sm btn-primary" href="{% url 'update_job' job.id %}">Update</a></td>
+					</tr>
+				{% endfor %}
+
+			</table>
+		</div>
+	</div>
+
+	<div class="col-md-6 p-4">
+		<br>
+		<h5>MACHINE</h5>
+		<hr>
+		<div class="card card-body">
+			<a class="btn btn-sm btn-primary" href="{% url 'create_machine' %}">Create Machine</a>
+			
+			<table class="table table-sm">
+				<tr>
+					<th>Machine</th>
+					<th>Inputs</th>
+					<th>Quantity</th>
+				</tr>
+
+				{% for machine in machines %}
+				{% for input in machine.input.all %}
+					<tr>
+						<td>{{machine.machine_Number}}</td>
+						<td>{{input.input_Name}}</td>
+						<td>{{input.quantity_Per_1000_Units}}</td>
+						<td><a class="btn btn-sm btn-primary" href="{% url 'update_machine' machine.id %}">Update</a></td>
+					</tr>
+				{% endfor %}
+				{% endfor %}
+			</table>
+		</div>
+
+		<br>
+		<h5>INPUTS</h5>
+		<hr>
+		<div class="card card-body">
+			<a class="btn btn-sm btn-primary" href="{% url 'create_input' %}">Create Machine Input</a>
+			
+			<table class="table table-sm">
+				<tr>
+					<th>Inputs</th>
+					<th>Quantity</th>
+					<th>Vendor</th>
+				</tr>
+
+				{% for input in inputs %}
+					<tr>
+						<td>{{input.input_Name}}</td>
+						<td>{{input.quantity_Per_1000_Units}}</td>
+						<td>{{input.vendor}}</td>
+						<td><a class="btn btn-sm btn-primary" href="{% url 'update_input' input.id %}">Update</a></td>
+					</tr>
+				{% endfor %}
+			</table>
+		</div>
+	</div>
+
+	
 
 </div>
 

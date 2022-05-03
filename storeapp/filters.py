@@ -9,4 +9,4 @@ class OrderFilter(django_filters.FilterSet):
     class Meta:
         model = Order
         fields = '__all__'
-        exclude = ['customer', 'order_Date', 'billing_ID', 'shipment_ID', 'subtotal', 'total', 'date_created']
+        exclude = ['complete', 'customer', 'order_Date', 'billing_ID', 'shipment_ID', 'subtotal', 'total', 'date_created']

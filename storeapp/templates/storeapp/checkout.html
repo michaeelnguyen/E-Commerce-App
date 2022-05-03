@@ -103,6 +103,26 @@
                         <input class="form-control" type="text" name="zipcode" placeholder="Zip code..">
                     </div>
                 </div>
+
+                <hr>
+                <div id="billing-info">
+                    <hr>
+                    <p><strong>Billing Information:</strong></p>
+                    <hr>
+                    <div class="form-field">
+                        <input class="form-control" type="text" name="b_address" placeholder="Address..">
+                    </div>
+                    <div class="form-field">
+                        <input class="form-control" type="text" name="b_city" placeholder="City..">
+                    </div>
+                    <div class="form-field">
+                        <input class="form-control" type="text" name="b_state" placeholder="State..">
+                    </div>
+                    <div class="form-field">
+                        <input class="form-control" type="text" name="b_zipcode" placeholder="Zip code..">
+                    </div>
+                </div>
+
                 <hr>
                 <input id="form-button" class="btn btn-primary btn-block" type="submit" value="Continue">
             </form>
@@ -178,10 +198,22 @@
             'zipcode':null,
         }
 
+        var billingInfo = {
+            'address':null,
+            'city':null,
+            'state':null,
+            'zipcode':null,
+        }
+
         shippingInfo.address = form.address.value
 		shippingInfo.city = form.city.value
 		shippingInfo.state = form.state.value
 		shippingInfo.zipcode = form.zipcode.value
+
+        billingInfo.address = form.b_address.value
+		billingInfo.city = form.b_city.value
+		billingInfo.state = form.b_state.value
+		billingInfo.zipcode = form.b_zipcode.value
 
         if (user == 'AnonymousUser'){
             userFormData.name = form.name.value
@@ -189,6 +221,7 @@
         }
         
         console.log('Shipping Info:', shippingInfo)
+        console.log('Billing Info:', billingInfo)
 	    console.log('User Info:', userFormData)
 
         var url = '/process_order/'
@@ -199,12 +232,16 @@
                 'X-CSRFToken': csrftoken,
 
             },
-            body:JSON.stringify({'form': userFormData, 'shipping':shippingInfo}),
+            body:JSON.stringify({'form': userFormData, 'shipping': shippingInfo, 'billing': billingInfo}),
         })
         .then((response) => response.json())
 	    	.then((data) => {
 				console.log('Success:', data);
 				alert('Transaction completed');  
+
+                cart = {}
+                document.cookie ='cart=' + JSON.stringify(cart) + ";domain=;path=/"
+                
 				window.location.href = "{% url 'productListing' %}"
 
 			})

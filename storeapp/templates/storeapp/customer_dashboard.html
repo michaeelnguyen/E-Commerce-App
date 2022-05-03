@@ -19,7 +19,7 @@
 			<h5>Customer:</h5>
 			<hr>
 			<a class="btn btn-outline-primary  btn-sm btn-block" href="{% url 'update_customer' %}">Update Customer</a>
-			<a class="btn btn-outline-info  btn-sm btn-block" href="">Place Order</a>
+			<a class="btn btn-outline-info  btn-sm btn-block" href="{% url 'productListing' %}">Place Order</a>
 
 		</div>
 	</div>
@@ -28,8 +28,9 @@
 		<div class="card card-body">
 			<h5>Contact Information</h5>
 			<hr>
-			<p>Email: {{request.user.customer.customer_Email}}</p>
-			<p>Phone: {{request.user.customer.customer_Phone_Number}}</p>
+			<p>Name: {{customer.customer_First_Name}} {{customer.customer_Last_Name}}</p>
+			<p>Email: {{customer.customer_Email}}</p>
+			<p>Phone: {{customer.customer_Phone_Number}}</p>
 		</div>
 	</div>
 </div>
@@ -64,20 +65,26 @@
 			<table class="table table-sm">
 				<tr>
 					<th>Product</th>
+					<th>Confirmation #</th>
 					<th>Date Ordered</th>
 					<th>Status</th>
 					<th>Order Details</th>
 				</tr>
-
-				{% for order in orders %}
+				
+				{% for item in order_items %}
+					{% if item.order.complete %}
 					<tr>
-						<td>{{order.product}}</td>
-						<td>{{order.order_Date}}</td>
-						<td>{{order.order_Status}}</td>
-						<td><a class="btn btn-sm btn-primary" href="">View</a></td>
+						<td>{{item}}</td>
+						<td>{{item.order.confirmation_Number}}</td>
+						<td>{{item.order.date_created}}</td>
+						<td>{{item.order.order_Status}}</td>
+						<td><a class="btn btn-sm btn-primary" href="{% url 'update_order' item.order.id %}">Update</a></td>
+						<td><a class="btn btn-sm btn-danger" href="{% url 'delete_order' item.order.id %}">Cancel</a></td>
 
 					</tr>
-				{% endfor %}
+					{% endif %}
+					{% endfor %}
+
 			</table>
 		</div>
 	</div>

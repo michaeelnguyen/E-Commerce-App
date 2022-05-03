@@ -1,4 +1,5 @@
-from multiprocessing import AuthenticationError
+
+from itertools import product
 import random
 from django.shortcuts import redirect, render
 from django.http import HttpResponse, JsonResponse
@@ -8,17 +9,18 @@ from django.forms import inlineformset_factory
 
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth import views as auth_views
-
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import Group
+from django.urls import reverse
+from multi_form_view import MultiModelFormView
 from faker import Faker
 
 # Create your views here.
 from .models import *
-from .forms import OrderForm, ProductForm, CreateUserForm, CustomerForm
+from .forms import CustomProductForm, CustomVersionForm, InputForm, JobForm, MachineForm, OrderForm, ProductForm, CreateUserForm, CustomerForm, VersionForm
 from .filters import OrderFilter
 from .decorators import allowed_users, unauthenticated_user, admin_only
+from .utils import cookieCart, cartData, guestOrder
 
 
 def homePage(request):
@@ -28,9 +30,8 @@ def homePage(request):
         items = order.orderitem_set.all()
         cartItems = order.get_cart_items
     else:
-        items = []
-        order = {'get_cart_total': 0, 'get_cart_items': 0}
-        cartItems = order['get_cart_items']
+        cookieData = cookieCart(request)
+        cartItems = cookieData['cartItems']
 
     context = {'cartItems': cartItems}
     return render(request, 'storeapp/home.html', context)
@@ -38,7 +39,6 @@ def homePage(request):
 
 @unauthenticated_user
 def registerPage(request):
-
     form = CreateUserForm()
     if request.method == 'POST':
         form = CreateUserForm(request.POST)
@@ -48,8 +48,13 @@ def registerPage(request):
             messages.success(request, 'Account was created for ' +  username)
 
             return redirect('login')
+    
+    data = cartData(request)
+    cartItems = data['cartItems']
+    order = data['order']
+    items = data['items']
 
-    context = {'form': form}
+    context = {'form': form,'items':items, 'order': order, 'cartItems': cartItems}
     return render(request, 'storeapp/register.html', context)
 
 
@@ -64,11 +69,16 @@ def loginPage(request):
 
         if user is not None:
             login(request, user)
-            return redirect('customer_dashboard')
+            return redirect('productListing')
         else:
             messages.info(request, 'Username AND/OR Password is incorrect')
 
-    context = {}
+    data = cartData(request)
+    cartItems = data['cartItems']
+    order = data['order']
+    items = data['items']
+    
+    context = {'items':items, 'order': order, 'cartItems': cartItems}
     return render(request, 'storeapp/login.html', context )
 
 @unauthenticated_user
@@ -96,49 +106,35 @@ def logoutUser(request):
 
 
 
-
-
 def productListing(request):
 
     if request.user.is_authenticated and not request.user.is_staff:
         customer = request.user.customer
         order, created = Order.objects.get_or_create(customer=customer, complete=False)
-        items = order.orderitem_set.all()
+        #items = order.orderitem_set.all()
         cartItems = order.get_cart_items
     else:
-        items = []
-        order = {'get_cart_total': 0, 'get_cart_items': 0}
-        cartItems = order['get_cart_items']
+        cookieData = cookieCart(request)
+        cartItems = cookieData['cartItems']
 
     products = Product.objects.all()
     context = {'products': products, 'cartItems': cartItems}
     return render(request, 'storeapp/product_listing.html', context)
 
 def shoppingCart(request):
-
-    if request.user.is_authenticated:
-        customer = request.user.customer
-        order, created = Order.objects.get_or_create(customer=customer, complete=False)
-        items = order.orderitem_set.all()
-        cartItems = order.get_cart_items
-    else:
-        items = []
-        order = {'get_cart_total': 0, 'get_cart_items': 0 }
-        cartItems = order['get_cart_items']
+    data = cartData(request)
+    cartItems = data['cartItems']
+    order = data['order']
+    items = data['items']
 
     context = {'items':items, 'order': order, 'cartItems': cartItems}
     return render(request, 'storeapp/shopping_cart.html', context )
 
 def checkout(request):
-    if request.user.is_authenticated:
-        customer = request.user.customer
-        order, created = Order.objects.get_or_create(customer=customer, complete=False)
-        items = order.orderitem_set.all()
-        cartItems = order.get_cart_items
-    else:
-        items = []
-        order = {'get_cart_total': 0, 'get_cart_items': 0 }
-        cartItems = order['get_cart_items']
+    data = cartData(request)
+    cartItems = data['cartItems']
+    order = data['order']
+    items = data['items']
 
     context = {'items':items, 'order': order, 'cartItems': cartItems}
     return render(request, 'storeapp/checkout.html', context )
@@ -178,13 +174,12 @@ def processOrder(request):
     if request.user.is_authenticated:
         customer = request.user.customer
 
-        order, created = Order.objects.get_or_create(
-            customer = customer, 
-            complete = True,
-            confirmation_Number = transaction_id,
-            order_Status = 'Pending',
-            )
+        order, created = Order.objects.get_or_create(customer = customer, complete = False)
 
+        order.order_Status = 'Pending'
+        order.confirmation_Number = transaction_id
+        order.total = order.get_cart_total
+        order.complete = True
         order.save()
         
         Shipping.objects.create(
@@ -200,16 +195,41 @@ def processOrder(request):
             shipment_Quantity = order.get_cart_total,
             shipment_Weight = round(random.uniform(0.01, 500),2),
         )
+
+        Billing.objects.create(
+            customer=customer,
+            order=order,
+
+            billing_Address=data['billing']['address'],
+            billing_City=data['billing']['city'],
+            billing_State=data['billing']['state'],
+            billing_Zip=data['billing']['zipcode'],
+        )
         
     else:
-        print('User is not logged in')
+        customer, order = guestOrder(request, data)
+        order.complete = True
+        order.save()
 
     return JsonResponse('Payment Completed', safe=False)
 
 
 def productDetails(request, pk):
     product = Product.objects.get(id=pk)
-    return render(request, 'storeapp/productDetails.html', {'product': product})
+
+    if request.user.is_authenticated and not request.user.is_staff:
+        data = cartData(request)
+        cartItems = data['cartItems']
+        order = data['order']
+        items = data['items']
+        context = {'product': product, 'items':items, 'order': order, 'cartItems': cartItems}
+    
+
+
+    context = {'product': product}
+    return render(request, 'storeapp/productDetails.html', context)
+
+
 
 def productsPage(request):
     products = Product.objects.all()
@@ -225,37 +245,51 @@ def productsPage(request):
 def employee_dashboard(request):
     orders = Order.objects.all()
     products = Product.objects.all()
-
     customers = Customer.objects.all()
+    jobs = Job.objects.all()
+    versions = Version.objects.all()
+    machines = Machine.objects.all()
+    inputs = InputItem.objects.all()
+    order_items = OrderItem.objects.all()
 
     total_customers = customers.count()
-
     total_orders = orders.filter(complete=True).count()
     delivered = orders.filter(order_Status='Delivered').count()
     pending = orders.filter(order_Status='Pending').count()
 
-    context = {'orders':orders, 'products':products, 'customers':customers,
+    context = {'orders':orders, 'products':products, 'customers':customers, 'jobs':jobs, 'versions':versions, 'machines':machines, 'inputs': inputs,
     'total_orders':total_orders,'delivered':delivered,
-    'pending':pending}
+    'pending':pending, 'order_items':order_items}
 
     return render(request, 'storeapp/employee_dashboard.html', context)
 
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['customer'])
-def customer_dashboard(request):
+def customer_dashboard(request, pk):
+
     if request.user.is_authenticated:
         customer = request.user.customer
-        order, created = Order.objects.get_or_create(customer=customer, complete=False)
-        items = order.orderitem_set.all()
-        cartItems = order.get_cart_items
-    else:
-        items = []
-        order = {'get_cart_total': 0, 'get_cart_items': 0}
-        cartItems = order['get_cart_items']
-        
-    orders = request.user.customer.order_set.all()
+        #customer = Customer.objects.get(id=pk)
+        order = Order.objects.get(customer=customer, complete=False)
 
-    total_orders = orders.count()
+        #order, created = Order.objects.get_or_create(customer=customer, complete=True)
+        #order, created = Order.objects.filter(customer=customer, complete=True)
+        if order != Order.DoesNotExist:
+            items = order.orderitem_set.all()
+            data = cartData(request)
+            cartItems = data['cartItems']
+            order = data['order']
+        else:
+            order, created = Order.objects.get_or_create(customer=customer, complete=True)
+
+        
+    #orders = request.user.customer.order_set.all()
+    orders = customer.order_set.all()
+    order_items = OrderItem.objects.all()
+
+    # OFF BY ONE ERROR
+    total_orders = orders.filter(complete=True).count()
+    
     delivered = orders.filter(order_Status='Delivered').count()
     pending = orders.filter(order_Status='Pending').count()
 
@@ -263,8 +297,8 @@ def customer_dashboard(request):
     orders = myFilter.qs
     
 
-    context = {'orders':orders, 'total_orders':total_orders,'delivered':delivered,
-    'pending':pending, 'myFilter': myFilter, 'cartItems': cartItems }
+    context = {'orders': orders, 'total_orders': total_orders,'delivered': delivered,
+    'pending':pending, 'myFilter': myFilter, 'cartItems': cartItems, 'customer': customer, 'items': items, 'order_items': order_items}
 
     return render(request, 'storeapp/customer_dashboard.html', context)
 
@@ -279,10 +313,9 @@ def customer_dashboard(request):
     context = {'form': form}
     return render(request, 'storeapp/update.html', context)
 '''
-
 @login_required(login_url='login')
 @allowed_users(allowed_roles=['customer'])
-def updateCustomer(request):
+def accountSettings(request):
     customer = request.user.customer
     form = CustomerForm(instance=customer)    
 
@@ -290,10 +323,25 @@ def updateCustomer(request):
         form = CustomerForm(request.POST, instance=customer)
         if form.is_valid():
             form.save()
-            return redirect('customer_dashboard')
+            return redirect('customer_dashboard2', pk=request.user.customer.pk)
 
     context = {'form': form}
     return render(request, 'storeapp/account_settings.html', context)
+
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['admin', 'employee'])
+def updateCustomer(request, pk):
+    customer = Customer.objects.get(id=pk)
+    form = CustomerForm(instance=customer)    
+
+    if request.method == 'POST':
+        form = CustomerForm(request.POST, instance=customer)
+        if form.is_valid():
+            form.save()
+            return redirect('employee_dashboard')
+
+    context = {'form': form}
+    return render(request, 'storeapp/update.html', context)
 
 
 @login_required(login_url='login')
@@ -307,13 +355,13 @@ def createOrder(request, pk):
         formset = OrderFormSet(request.POST, instance=customer)
         if formset.is_valid():
             formset.save()
-            return redirect('/')
+            return redirect('employee_dashboard')
     
     context = {'formset': formset}
     return render(request, 'storeapp/orderUpdateForm.html', context)
 
 @login_required(login_url='login')
-@allowed_users(allowed_roles=['admin', 'employee'])
+@allowed_users(allowed_roles=['admin', 'employee', 'customer'])
 def updateOrder(request, pk):
 
     order = Order.objects.get(id=pk)
@@ -323,7 +371,10 @@ def updateOrder(request, pk):
         form = OrderForm(request.POST, instance=order)
         if form.is_valid():
             form.save()
-            return redirect('/')
+            if request.user.is_staff:
+                return redirect('employee_dashboard')
+            else:
+                return redirect('customer_dashboard')
 
     context = {'form': form}
     return render(request, 'storeapp/update.html', context)
@@ -345,6 +396,7 @@ def createProduct(request):
         form = ProductForm(request.POST)
         if form.is_valid():
             form.save()
+            return redirect('employee_dashboard')
     
     context = {'form': form}
     return render(request, 'storeapp/update.html', context)
@@ -360,7 +412,155 @@ def updateProduct(request, pk):
         form = ProductForm(request.POST, instance=product)
         if form.is_valid():
             form.save()
-            return redirect('/')
+            return redirect('employee_dashboard')
 
     context = {'form': form}
     return render(request, 'storeapp/update.html', context)
+
+
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['admin', 'employee'])
+def createJob(request):
+    form = JobForm()
+    if request.method == 'POST':
+        form = JobForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('employee_dashboard')
+    
+    context = {'form': form}
+    return render(request, 'storeapp/update.html', context)
+
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['admin', 'employee'])
+def updateJob(request, pk):
+    
+    job = Job.objects.get(id=pk)
+    form = JobForm(instance=job)    
+
+    if request.method == 'POST':
+        form = JobForm(request.POST, instance=job)
+        if form.is_valid():
+            form.save()
+            return redirect('employee_dashboard')
+
+    context = {'form': form}
+    return render(request, 'storeapp/update.html', context)
+
+
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['admin', 'employee'])
+def createVersion(request):
+    form = VersionForm()
+    if request.method == 'POST':
+        form = VersionForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('employee_dashboard')
+    
+    context = {'form': form}
+    return render(request, 'storeapp/update.html', context)
+
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['admin', 'employee'])
+def updateVersion(request, pk):
+    
+    ver = Version.objects.get(id=pk)
+    form = VersionForm(instance=ver)    
+
+    if request.method == 'POST':
+        form = VersionForm(request.POST, instance=ver)
+        if form.is_valid():
+            form.save()
+            return redirect('employee_dashboard')
+
+    context = {'form': form}
+    return render(request, 'storeapp/update.html', context)
+
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['admin', 'employee'])
+def createMachine(request):
+    form = MachineForm()
+    if request.method == 'POST':
+        form = MachineForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('employee_dashboard')
+    
+    context = {'form': form}
+    return render(request, 'storeapp/update.html', context)
+
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['admin', 'employee'])
+def updateMachine(request, pk):
+    
+    mach = Machine.objects.get(id=pk)
+    form = MachineForm(instance=mach)    
+
+    if request.method == 'POST':
+        form = MachineForm(request.POST, instance=mach)
+        if form.is_valid():
+            form.save()
+            return redirect('employee_dashboard')
+
+    context = {'form': form}
+    return render(request, 'storeapp/update.html', context)
+
+
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['admin', 'employee'])
+def createInput(request):
+    form = InputForm()
+    if request.method == 'POST':
+        form = InputForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('employee_dashboard')
+    
+    context = {'form': form}
+    return render(request, 'storeapp/update.html', context)
+
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['admin', 'employee'])
+def updateInput(request, pk):
+    
+    input = InputItem.objects.get(id=pk)
+    form = InputForm(instance=input)    
+
+    if request.method == 'POST':
+        form = InputForm(request.POST, instance=input)
+        if form.is_valid():
+            form.save()
+            return redirect('employee_dashboard')
+
+    context = {'form': form}
+    return render(request, 'storeapp/update.html', context)
+
+
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['admin', 'employee'])
+def createCustomVersion(request):
+    form = CustomVersionForm()
+    if request.method == 'POST':
+        form = CustomVersionForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('create_custom_product')
+
+    context = {'form': form}
+    return render(request, 'storeapp/custom_design.html', context)
+
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['admin', 'employee'])
+def createCustomProduct(request):
+
+    if request.method == 'POST':
+        form = CustomProductForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('productListing')
+    else:
+        form = CustomProductForm()
+
+    context = {'form': form}
+    return render(request, 'storeapp/custom_design2.html', context)
