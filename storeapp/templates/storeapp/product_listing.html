@@ -50,13 +50,17 @@
                             </div>
                             <!-- Product actions-->
                             <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
-                                <div class="text-center"><a class="btn btn-outline-dark mt-auto" href="{% url 'create_custom_version' %}">Enter Design Form</a></div>
+                                {% if customer %}
+                                <div class="text-center"><a class="btn btn-outline-dark mt-auto" href="{% url 'create_custom_version' customer.id %}">Enter Design Form</a></div>
+                                {% else %}
+                                <div class="text-center"><a class="btn btn-outline-dark mt-auto" href="{% url 'create_custom_admin' %}">Enter Design Form</a></div>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
                     
                     {% for product in products %}
-
+                    {% if product.is_active and not product.is_custom %}
                     <div class="col mb-5">
                         <div class="card h-100">
                             <!-- Product image-->
@@ -90,6 +94,7 @@
                             </div>
                         </div>
                     </div>
+                    {% endif %}
                     {% endfor %}
                 </div>
             </div>

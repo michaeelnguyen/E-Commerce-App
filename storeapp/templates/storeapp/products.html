@@ -21,7 +21,7 @@
             <div class="container px-4 px-lg-5 my-5">
                 <div class="text-center text-white">
                     <h1 class="display-4 fw-bolder">Pliable Plastic Production</h1>
-                    <p class="lead fw-normal text-white-50 mb-0">Products Page</p>
+                    <p class="lead fw-normal text-white-50 mb-0">Custom Product</p>
                 </div>
             </div>
         </header>
@@ -43,18 +43,23 @@
 									<th>Category</th>
 									<th>Material</th>
                                     <th>File</th>
+                                    <th></th>
 								</tr>
 		
-								{% for i in products %}
-                                {% if i.is_custom %}
+								{% for p in products %}
+                                {% for v in versions %}
+                                {% if p.version_ID == v %}
 									<tr>
-										<td>{{i.product_Name}}</td>
-										<td>{{i.category_ID}}</td>
-										<td>{{i.material_ID}}</td>
-                                        <td>{{i.version_ID.product_Design_File}}</td>
-                                        <td><div class="text-right"><a data-product="{{i.id}}" data-action="add" class="btn btn-outline-dark mt-auto add-btn update-cart">Add to Cart</a></div></td>
+										<td>{{p.product_Name}}</td>
+										<td>{{p.category_ID}}</td>
+										<td>{{p.material_ID}}</td>
+                                        <td>{{p.version_ID.product_Design_File}}</td>
+                                        <td><a class="btn btn-sm btn-primary" href="{% url 'update_custom_product' p.id %}">Update Product</a></td>
+                                        <td><a class="btn btn-sm btn-primary" href="{% url 'update_custom_version' v.id %}">Update Design Version</a></td>
+                                        <td><a data-product="{{p.id}}" data-action="add" class="btn btn-outline-dark mt-auto add-btn update-cart">Add to Cart</a></td>
 									</tr>
                                 {% endif %}
+                                {% endfor %}
 								{% endfor %}
 								
 							</table>

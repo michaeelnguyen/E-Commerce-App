@@ -1,5 +1,3 @@
-
-from itertools import product
 import random
 from django.shortcuts import redirect, render
 from django.http import HttpResponse, JsonResponse
@@ -10,15 +8,15 @@ from django.forms import inlineformset_factory
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import Group
+from django.contrib.auth.forms import SetPasswordForm
 from django.urls import reverse
 from multi_form_view import MultiModelFormView
 from faker import Faker
 
 # Create your views here.
 from .models import *
-from .forms import CustomProductForm, CustomVersionForm, InputForm, JobForm, MachineForm, OrderForm, ProductForm, CreateUserForm, CustomerForm, VersionForm
-from .filters import OrderFilter
+from .forms import BillingForm, CustomProductForm, CustomVersionForm, EditOrderForm, InputForm, JobForm, MachineForm, OrderForm, OrderItemForm, ProductForm, CreateUserForm, CustomerForm, ShippingForm, VersionForm, ViewOrderForm, ViewOrderItemForm
+from .filters import OrderFilter, OrderItemFilter
 from .decorators import allowed_users, unauthenticated_user, admin_only
 from .utils import cookieCart, cartData, guestOrder
 
@@ -113,6 +111,9 @@ def productListing(request):
         order, created = Order.objects.get_or_create(customer=customer, complete=False)
         #items = order.orderitem_set.all()
         cartItems = order.get_cart_items
+        products = Product.objects.all()
+        context = {'products': products, 'cartItems': cartItems, 'customer': customer}
+        return render(request, 'storeapp/product_listing.html', context)
     else:
         cookieData = cookieCart(request)
         cartItems = cookieData['cartItems']
@@ -192,7 +193,7 @@ def processOrder(request):
             shipping_Zip=data['shipping']['zipcode'],
             
             shipment_Cost = round(random.uniform(4.99, 20),2),
-            shipment_Quantity = order.get_cart_total,
+            shipment_Quantity = order.get_cart_items,
             shipment_Weight = round(random.uniform(0.01, 500),2),
         )
 
@@ -231,9 +232,13 @@ def productDetails(request, pk):
 
 
 
-def productsPage(request):
+def productsPage(request,pk):
+    customer = Customer.objects.get(id=pk)
+
+    versions = Version.objects.filter(customer=customer)
     products = Product.objects.all()
-    return render(request, 'storeapp/products.html', {'products': products})
+    
+    return render(request, 'storeapp/products.html', {'customer': customer, 'products': products, 'versions': versions})
 
 
 
@@ -283,7 +288,6 @@ def customer_dashboard(request, pk):
             order, created = Order.objects.get_or_create(customer=customer, complete=True)
 
         
-    #orders = request.user.customer.order_set.all()
     orders = customer.order_set.all()
     order_items = OrderItem.objects.all()
 
@@ -293,8 +297,8 @@ def customer_dashboard(request, pk):
     delivered = orders.filter(order_Status='Delivered').count()
     pending = orders.filter(order_Status='Pending').count()
 
-    myFilter = OrderFilter(request.GET, queryset=orders)
-    orders = myFilter.qs
+    myFilter = OrderItemFilter(request.GET, queryset=order_items)
+    order_items = myFilter.qs
     
 
     context = {'orders': orders, 'total_orders': total_orders,'delivered': delivered,
@@ -365,10 +369,10 @@ def createOrder(request, pk):
 def updateOrder(request, pk):
 
     order = Order.objects.get(id=pk)
-    form = OrderForm(instance=order)    
+    form = EditOrderForm(instance=order)    
 
     if request.method == 'POST':
-        form = OrderForm(request.POST, instance=order)
+        form = EditOrderForm(request.POST, instance=order)
         if form.is_valid():
             form.save()
             if request.user.is_staff:
@@ -379,13 +383,39 @@ def updateOrder(request, pk):
     context = {'form': form}
     return render(request, 'storeapp/update.html', context)
 
+
+
 @login_required(login_url='login')
-@allowed_users(allowed_roles=['admin', 'employee'])
-def deleteOrder(request, pk):
+@allowed_users(allowed_roles=['admin', 'employee', 'customer'])
+def cancelOrder(request, pk):
+    if request.user.is_staff:
+        user = request.user.employee
+        user = Employee.objects.get(id=user.id)
+    else:
+        user = request.user.customer
+        user = Customer.objects.get(id=user.id)
+
     order = Order.objects.get(id=pk)
 
-    context = {'item': order}
-    return render(request, 'storeapp/delete.html', context)
+    if request.method == 'POST':
+        order.order_Status = 'Cancelled'
+        order.is_active = False
+        order.save(update_fields=['order_Status', 'is_active'], force_update=True)
+
+        order_items = OrderItem.objects.filter(order=order)
+        for item in order_items:
+            item.order=order
+            item.save(update_fields=['order'], force_update=True)
+
+        redirect('customer_dashboard2', user.id)
+
+    context = {'order': order, 'user': user}
+
+    return render(request, 'storeapp/cancel.html', context)
+
+
+
+
 
 
 @login_required(login_url='login')
@@ -538,8 +568,39 @@ def updateInput(request, pk):
 
 
 @login_required(login_url='login')
+@allowed_users(allowed_roles=['customer'])
+def createCustomVersion(request,pk):
+    form = CustomVersionForm()
+    form.fields['customer'].empty_label = None
+    form.fields['customer'].queryset = Customer.objects.filter(id=pk)
+
+    if request.method == 'POST':
+        form = CustomVersionForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            return redirect('create_custom_product', pk=request.user.customer.pk)
+
+    context = {'form': form}
+    return render(request, 'storeapp/custom_design.html', context)
+
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['customer'])
+def updateCustomVersion(request, pk):
+    ver = Version.objects.get(id=pk)
+    form = CustomVersionForm(instance=ver)    
+
+    if request.method == 'POST':
+        form = CustomVersionForm(request.POST, instance=ver)
+        if form.is_valid():
+            form.save()
+            return redirect('products', pk=request.user.customer.pk)
+
+    context = {'form': form}
+    return render(request, 'storeapp/update.html', context)
+
+@login_required(login_url='login')
 @allowed_users(allowed_roles=['admin', 'employee'])
-def createCustomVersion(request):
+def createCustomAdmin(request):
     form = CustomVersionForm()
     if request.method == 'POST':
         form = CustomVersionForm(request.POST, request.FILES)
@@ -551,16 +612,66 @@ def createCustomVersion(request):
     return render(request, 'storeapp/custom_design.html', context)
 
 @login_required(login_url='login')
-@allowed_users(allowed_roles=['admin', 'employee'])
-def createCustomProduct(request):
-
+@allowed_users(allowed_roles=['admin', 'employee', 'customer'])
+def createCustomProduct(request, pk):
+    form = CustomProductForm()
+    form.fields['version_ID'].queryset = Version.objects.filter(customer=pk)
     if request.method == 'POST':
         form = CustomProductForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('productListing')
-    else:
-        form = CustomProductForm()
+            return redirect('products', pk=request.user.customer.pk)
 
     context = {'form': form}
     return render(request, 'storeapp/custom_design2.html', context)
+
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['customer'])
+def updateCustomProduct(request, pk):
+    
+    product = Product.objects.get(id=pk)
+    form = CustomProductForm(instance=product)    
+
+    if request.method == 'POST':
+        form = CustomProductForm(request.POST, instance=product)
+        if form.is_valid():
+            form.save()
+            return redirect('products', pk=request.user.customer.pk)
+
+    context = {'form': form}
+    return render(request, 'storeapp/update.html', context)
+
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['customer'])
+def updateOrderItem(request, pk):
+    order_item = OrderItem.objects.get(id=pk)
+    form = OrderItemForm(instance=order_item)    
+
+    if request.method == 'POST':
+        form = OrderItemForm(request.POST, instance=order_item)
+        if form.is_valid():
+            form.save()
+            return redirect('employee_dashboard')
+
+    context = {'form': form}
+    return render(request, 'storeapp/update.html', context)
+
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['customer'])
+def viewOrder(request, pk):
+    
+    order = Order.objects.get(id=pk)
+    #order_item = OrderItem.objects.get(order=order)
+    order_items = OrderItem.objects.filter(order=order)
+    billing = Billing.objects.get(order=order)
+    shipping = Shipping.objects.get(order=order)
+
+
+    form = ViewOrderForm(instance=order)
+    #form2 = ViewOrderItemForm(instance=order_item)
+    form3 = BillingForm(instance=billing)    
+    form4 = ShippingForm(instance=shipping)
+
+    #context = {'form': form, 'form2': form2, 'form3': form3, 'form4': form4, 'order_items': order_items}
+    context = {'form': form, 'form3': form3, 'form4': form4, 'order_items': order_items}
+    return render(request, 'storeapp/view.html', context)

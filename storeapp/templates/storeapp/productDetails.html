@@ -44,30 +44,10 @@
             </div>
 
         </section>
-        <!-- Related items section-->
+        <!-- PRODUCT AND VERSION INFORMATION-->
         <section class="py-5 bg-light">
-        Product Description
+            <h5>Product Description</h5>
         </section>
-
-{% comment %}         <script>
-            $(document).on('click', '#add-button', function(e){
-                e.preventDefault();
-                $.ajax({
-                    type: 'POST',
-                    url: '{% url "basket:basket_add" %}',
-                    data:{
-                        productid: $('#add-button').val(),
-                        productqty: $('#inputQuantity').val(),
-                        csrfmiddlewaretoken: "{{csrf_token}}",
-                        action: 'post',
-                    },
-                    success: function (json) {
-                        document.getElementById("basket-qty").innerHTML = json.qty
-                    },
-                    error: function(xhr, errmsg, err) {}                
-                });
-            })
-        </script> {% endcomment %}
 
         <!-- Footer-->
         <footer class="py-5 bg-dark">

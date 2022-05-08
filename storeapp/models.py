@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.conf import settings
 from django.db import models
 from django.utils.text import slugify
@@ -129,6 +130,7 @@ class Material(models.Model):
 
 class Version(models.Model):
     #product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
+    customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, blank=True)
     
     product_Image = models.ImageField(upload_to='media/storeapp/product_images', null=True, blank=True)
     product_Version = models.CharField(max_length=255, null=True, blank=True)
@@ -139,8 +141,14 @@ class Version(models.Model):
     date_created = models.DateTimeField(auto_now_add=True, null=True)
     is_active = models.BooleanField(default=True)
 
+    class Meta:
+        ordering = ['product_Version']
+
     def __str__(self):
-        return self.product_Version
+        if self.customer is None:
+            return f'{self.product_Version}'
+        else:
+            return f'Custom Design: {self.customer} - v{self.product_Version}'
 
 
 class InputItem(models.Model):
@@ -151,6 +159,9 @@ class InputItem(models.Model):
     
     date_created = models.DateTimeField(auto_now_add=True, null=True)
     is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ['-input_Name']
 
     def __str__(self):
         return f'{self.input_Name} / QTY: {self.quantity_Per_1000_Units}'
@@ -168,12 +179,12 @@ class Job(models.Model):
     is_active = models.BooleanField(default=True)
 
     class Meta:
-        ordering = ['start_Time']
+        ordering = ['-start_Time']
 
     def __str__(self):
         if self.end_Time == None:
-            return f'[START TIME: {self.start_Time}] [END TIME: IN PROGRESS...]'
-        return f'[START TIME: {self.start_Time}] [END TIME: {self.end_Time}]'
+            return f'{self.employee} - [START TIME: {self.start_Time}] [END TIME: IN PROGRESS...]'
+        return f'{self.employee} - [START TIME: {self.start_Time.strftime("%m/%d/%Y, %H:%M")}] [END TIME: {self.end_Time.strftime("%m/%d/%Y, %H:%M")}]'
 
 
 class Machine(models.Model):
@@ -213,7 +224,7 @@ class Category(models.Model):
 class Product(models.Model):
     product_Name = models.CharField(max_length=255, null=True)
     product_Description = models.CharField(max_length=255, null=True)
-    product_Price = models.DecimalField(max_digits=12, decimal_places=2, null=True)
+    product_Price = models.DecimalField(max_digits=12, decimal_places=2, null=True, default=Decimal('0.00'))
     product_Stock = models.BooleanField(default=True)
     
     height = models.DecimalField(max_digits=5, decimal_places=2, null=True)
@@ -223,7 +234,7 @@ class Product(models.Model):
     category_ID = models.ForeignKey(Category, on_delete=models.RESTRICT)
     material_ID = models.ForeignKey(Material, null=True, on_delete=models.DO_NOTHING)
     version_ID = models.ForeignKey(Version, related_name='versionList', null=True, on_delete=models.DO_NOTHING, blank=True)
-    job_ID = models.ForeignKey(Job, null=True, on_delete=models.DO_NOTHING)
+    job_ID = models.ForeignKey(Job, null=True, on_delete=models.DO_NOTHING, blank=True)
     
     is_custom = models.BooleanField(default=False)
     
@@ -250,7 +261,7 @@ class Order(models.Model):
         ('Shipped', 'Shipped'),
         ('Out for Delivery', 'Out for Delivery'),
         ('Delivered', 'Delivered'),
-        ('Canceled', 'Canceled'),
+        ('Cancelled', 'Cancelled'),
     )
 
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True)
@@ -261,7 +272,6 @@ class Order(models.Model):
     order_Status = models.CharField(max_length=255, null=True, blank=True, choices=STATUS)
     confirmation_Number = models.CharField(max_length=255, null=True)
     
-    #subtotal = models.DecimalField(max_digits=12, decimal_places=2, null=True)
     total = models.DecimalField(max_digits=12, decimal_places=2, null=True) 
     
     date_created = models.DateTimeField(auto_now_add=True, null=True)
@@ -283,7 +293,7 @@ class Order(models.Model):
         return total
 
     def __str__(self):
-        return f'Order Number: {self.confirmation_Number} , Order Date: {self.order_Date.strftime("%d.%m.%Y")}, STATUS: {self.order_Status}'
+        return f'Order Number: {self.confirmation_Number}, Order Date: {self.order_Date.strftime("%d.%m.%Y")}, Customer: {self.customer}'
 
 
 

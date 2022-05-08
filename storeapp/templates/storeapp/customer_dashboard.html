@@ -14,17 +14,17 @@
 <br>
 
 <div class="row">
-	<div class="col-md">
-		<div class="card card-body">
-			<h5>Customer:</h5>
+	<div class="col-md-5">
+		<div class="card card-body m-4 p-2" style="height:auto; width:500px;">
+			<h5>Welcome {{customer.customer_First_Name}}!</h5>
 			<hr>
-			<a class="btn btn-outline-primary  btn-sm btn-block" href="{% url 'update_customer' %}">Update Customer</a>
-			<a class="btn btn-outline-info  btn-sm btn-block" href="{% url 'productListing' %}">Place Order</a>
+			<a class="btn btn-outline-primary  btn-sm" href="{% url 'update_customer' %}">Update Customer</a>
+			<a class="btn btn-outline-primary btn-sm" href="{% url 'products' customer.id %}">View Custom Products</a>
 
 		</div>
 	</div>
 
-	<div class="col-md">
+	<div class="col-md-5">
 		<div class="card card-body">
 			<h5>Contact Information</h5>
 			<hr>
@@ -47,7 +47,7 @@
 			<form method="get">
 				{{myFilter.form}}
 
-		    <button class="btn btn-primary" type="submit">Search</button>
+		    	<button class="btn btn-primary" type="submit">Search</button>
 		  </form>
 
 		</div>
@@ -56,19 +56,23 @@
 </div>
 <br>
 
-<div class="row">
-	<div class="col-md-7">
+<div class="row p-1">
+	<div class="col-md">
 		<h5>Orders</h5>
 		<hr>
 		<div class="card card-body">
-			<a class="btn btn-sm btn-primary" href="{% url 'productListing' %}">Create Order</a>
 			<table class="table table-sm">
 				<tr>
 					<th>Product</th>
 					<th>Confirmation #</th>
 					<th>Date Ordered</th>
 					<th>Status</th>
+					<th>Quantity</th>
+					<th>Custom?</th>
+					{% comment %} <th>Is active?</th> {% endcomment %}
 					<th>Order Details</th>
+					<th>Update Quantity</th>
+					<th>Cancel Order</th>
 				</tr>
 				
 				{% for item in order_items %}
@@ -77,9 +81,18 @@
 						<td>{{item}}</td>
 						<td>{{item.order.confirmation_Number}}</td>
 						<td>{{item.order.date_created}}</td>
-						<td>{{item.order.order_Status}}</td>
-						<td><a class="btn btn-sm btn-primary" href="{% url 'update_order' item.order.id %}">Update</a></td>
-						<td><a class="btn btn-sm btn-danger" href="{% url 'delete_order' item.order.id %}">Cancel</a></td>
+						<td><strong>{{item.order.order_Status}}</strong></td>
+						<td>{{item.quantity}}</td>
+						<td>{{item.product.is_custom}}</td>
+						{% comment %} <td>{{item.order.is_active}}</td> {% endcomment %}
+						<td><a class="btn btn-sm btn-primary" href="{% url 'view_order' item.order.id  %}">View Order</a></td>
+						{% comment %} {% if item.order.order_Status == 'Pending' %} {% endcomment %}
+						<td><a class="btn btn-sm btn-warning" href="{% url 'update_orderitem' item.id %}">Update</a></td>
+						<td><a class="btn btn-sm btn-danger" href="{% url 'cancel_order' item.order.id %}">Cancel</a></td>
+						{% comment %} {% else %} {% endcomment %}
+						<td></td>
+						<td></td>
+						{% comment %} {% endif %} {% endcomment %}
 
 					</tr>
 					{% endif %}
@@ -88,7 +101,6 @@
 			</table>
 		</div>
 	</div>
-
 </div>
 
 {% endblock %}

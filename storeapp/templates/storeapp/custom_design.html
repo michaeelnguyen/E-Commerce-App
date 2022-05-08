@@ -40,7 +40,7 @@
             <br>
 
             <div class="row gx-4 gx-lg-5 row-cols-3 row-cols-md-3 row-cols-xl-3">
-                <div class="card card-body row-cols-1 m-2" style="background: #343a40;">
+                <div class="card card-body row-cols-1 m-2 text-center" style="background: #343a40;">
                         <form action="" method="POST" enctype="multipart/form-data">
                             {% csrf_token %}
                             <div class="col mb-5">
@@ -48,8 +48,9 @@
                             <div class "card-title"><h3>Design Information (Page 1 of 2)</h3></div>
                             <hr>
                                 {{form.as_p}}  
-                                <input class="btn btn-primary" type="submit" name="Submit">
                             </div>
+                            <br>
+                            <input class="btn btn-primary" type="submit" name="Submit">
                             </div>
                         </form>
                 </div>

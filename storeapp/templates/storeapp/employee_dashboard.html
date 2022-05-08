@@ -15,13 +15,14 @@
 {%  include 'storeapp/status.html' %}
 <br>
 
-<div class="row">
+<div class="row p-1">
 	<div class="col-md-6 p-4">
-		<h5>CUSTOMERS</h5>
+		<h5 style="display:inline;">CUSTOMERS</h5>
+		<div style="float:right; height:auto; width:200px;">
+			<!-- <a class="btn btn-sm btn-primary" href="">Create Customer</a> -->
+		</div>
 		<hr>
 		<div class="card card-body">
-			<a class="btn btn-sm btn-primary" href="">Create Customer</a>
-			
 			<table class="table table-sm">
 				<tr>
 					<th>Customer</th>
@@ -55,6 +56,9 @@
 					<th>Confirmation #</th>
 					<th>Date Ordered</th>
 					<th>Status</th>
+					<th>Quantity</th>
+					<th>Custom?</th>
+					<th></th>
 				</tr>
 
 					{% for item in order_items %}
@@ -63,9 +67,19 @@
 						<td>{{item}}</td>
 						<td>{{item.order.confirmation_Number}}</td>
 						<td>{{item.order.date_created}}</td>
-						<td>{{item.order.order_Status}}</td>
+						<td><strong>{{item.order.order_Status}}</strong></td>
+						<td class='text-center'>{{item.quantity}}</td>
+						<td>
+							<div class="d-flex justify-content-center small mb-2">
+								{% if item.product.is_custom %}
+									<p class="text-success">Yes</p>
+								{% else %}
+									<p></p>
+								{% endif %}
+							</div>
+						</td>
 						<td><a class="btn btn-sm btn-primary" href="{% url 'update_order' item.order.id %}">Update</a></td>
-						<td><a class="btn btn-sm btn-danger" href="{% url 'delete_order' item.order.id %}">Cancel</a></td>
+						<td><a class="btn btn-sm btn-warning" style="heigh:auto; width:125px;" href="{% url 'update_orderitem' item.id %}">Update Quantity</a></td>
 
 					</tr>
 					{% endif %}
@@ -78,18 +92,19 @@
 	
 	<div class="col-md-6 p-4">
 		<br>
-		<h5>PRODUCTS</h5>
+		<h5 style="display:inline;">PRODUCTS</h5>
+		<div style="float:right; height:auto; width:200px;">
+			<a class="btn btn-sm btn-warning" href="{% url 'create_product' %}">Create Product</a>
+		</div>
 		<hr>
 		<div class="card card-body">
-			<a class="btn btn-sm btn-primary" href="{% url 'create_product' %}">Create Product</a>
-			
 			<table class="table table-sm">
 				<tr>
 					<th>SKU</th>
 					<th>Product</th>
 					<th>Version</th>
-					<th>Price</th>
 					<th>Stock</th>
+					<th>Price</th>
 					
 
 				</tr>
@@ -99,10 +114,18 @@
 						<td>{{product.id}}</td>
 						<td>{{product.product_Name}}</td>
 						<td>{{product.version_ID}}</td>
-						<td>{{product.product_Stock}}</td>
+						
+						<td>
+							<div class="d-flex justify-content-center small mb-2">
+								{% if product.product_Stock %}
+								<div class="text-success">In Stock</div>
+								{% else %}
+								<div class="text-danger">Out of Stock</div>
+								{% endif %}
+							</div>
+						</td>
 						<td>{{product.product_Price}}</td>
 						<td><a class="btn btn-sm btn-primary" href="{% url 'update_product' product.id %}">Update</a></td>
-						<td><a class="btn btn-sm btn-danger" href="">Remove</a></td>
 					</tr>
 				{% endfor %}
 
@@ -112,11 +135,12 @@
 
 	<div class="col-md-6 p-4">
 		<br>
-		<h5>VERSIONS</h5>
+		<h5 style="display:inline;">VERSIONS</h5>
+		<div style="float:right; height:auto; width:200px;">
+			<a class="btn btn-sm btn-warning" href="{% url 'create_version' %}">Create Version</a>
+		</div>
 		<hr>
 		<div class="card card-body">
-			<a class="btn btn-sm btn-primary" href="{% url 'create_version' %}">Create Version</a>
-			
 			<table class="table table-sm">
 				<tr>
 					<th>Version</th>
@@ -139,11 +163,12 @@
 
 	<div class="col-md-6 p-4">
 		<br>
-		<h5>JOBS</h5>
+		<h5 style="display:inline;">JOBS</h5>
+		<div style="float:right; height:auto; width:200px;">
+			<a class="btn btn-sm btn-warning" href="{% url 'create_job' %}">Create Job</a>
+		</div>
 		<hr>
 		<div class="card card-body" style="height:1150px; width:auto;">
-			<a class="btn btn-sm btn-primary" href="{% url 'create_job' %}">Create Job</a>
-			
 			<table class="table table-sm">
 				<tr>
 					<th>Job Number</th>
@@ -170,11 +195,12 @@
 
 	<div class="col-md-6 p-4">
 		<br>
-		<h5>MACHINE</h5>
+		<h5 style="display:inline;">MACHINES</h5>
+		<div style="float:right; height:auto; width:200px;">
+			<a class="btn btn-sm btn-warning" href="{% url 'create_machine' %}">Create Machine</a>
+		</div>
 		<hr>
 		<div class="card card-body">
-			<a class="btn btn-sm btn-primary" href="{% url 'create_machine' %}">Create Machine</a>
-			
 			<table class="table table-sm">
 				<tr>
 					<th>Machine</th>
@@ -196,11 +222,12 @@
 		</div>
 
 		<br>
-		<h5>INPUTS</h5>
+		<h5 style="display:inline;">INPUTS</h5>
+		<div style="float:right; height:auto; width:200px;">
+			<a class="btn btn-sm btn-warning" href="{% url 'create_input' %}">Create Machine Input</a>
+		</div>
 		<hr>
 		<div class="card card-body">
-			<a class="btn btn-sm btn-primary" href="{% url 'create_input' %}">Create Machine Input</a>
-			
 			<table class="table table-sm">
 				<tr>
 					<th>Inputs</th>

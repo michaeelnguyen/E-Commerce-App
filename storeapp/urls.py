@@ -12,7 +12,8 @@ urlpatterns = [
     path('emp_login/', storeapp_views.emp_loginPage, name='emp_login'),
     path('logout/', storeapp_views.logoutUser, name="logout"),
 
-    path('products/', storeapp_views.productsPage, name="products"),
+
+    path('products/<str:pk>/', storeapp_views.productsPage, name="products"),
 
     
     path('shop/', storeapp_views.productListing, name="productListing"),
@@ -31,8 +32,9 @@ urlpatterns = [
     path('dashboard/<str:pk>/', storeapp_views.customer_dashboard, name="customer_dashboard2"),
 
     path('create_order/<str:pk>/', storeapp_views.createOrder, name="create_order"),
+    path('view_order/<str:pk>', storeapp_views.viewOrder, name='view_order'),
     path('update_order/<str:pk>/', storeapp_views.updateOrder, name="update_order"),
-    path('delete_order/<str:pk>/', storeapp_views.deleteOrder, name="delete_order"),
+    path('cancel_order/<str:pk>/', storeapp_views.cancelOrder, name="cancel_order"),
 
     #path('create_customer/', storeapp_views.createCustomer, name="create_customer"),
     path('update_customer/', storeapp_views.accountSettings, name="update_customer"),
@@ -54,11 +56,15 @@ urlpatterns = [
     path('create_input/', storeapp_views.createInput, name="create_input"),
     path('update_input/<str:pk>/', storeapp_views.updateInput, name="update_input"),
 
+    path('create_custom_admin/', storeapp_views.createCustomAdmin, name="create_custom_admin"),
+    
+    path('create_custom_version/<str:pk>/', storeapp_views.createCustomVersion, name="create_custom_version"),
+    path('update_custom_version/<str:pk>/', storeapp_views.updateCustomVersion, name="update_custom_version"),
 
-    path('create_custom_version/', storeapp_views.createCustomVersion, name="create_custom_version"),
-    path('create_custom_product/', storeapp_views.createCustomProduct, name="create_custom_product"),
+    path('create_custom_product/<str:pk>/', storeapp_views.createCustomProduct, name="create_custom_product"),
+    path('update_custom_product/<str:pk>/', storeapp_views.updateCustomProduct, name="update_custom_product"),
 
-
+    path('update_orderitem/<str:pk>', storeapp_views.updateOrderItem, name='update_orderitem'),
 
 
 

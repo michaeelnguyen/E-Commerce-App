@@ -32,10 +32,16 @@
         <!-- Section-->
         <section class="py-5">
             <div class=" card card-body">
-                <p> Are you sure you want to delete <br>"{{item}}"?</p>
-                <form action="{% url 'delete_order' item.id %}" method="POST">
-                    <a class="btn btn-warning" href="{% url 'employee_dashboard' %}">Cancel</a>
-                    <input class="btn btn-danger" type="submit" name="Confirm">
+                <p> Are you sure you want to cancel order <br>"{{order}}"?</p>
+                <form action="{% url 'cancel_order' order.id %}" method="POST">
+                    {% csrf_token %}
+
+                    {% if request.user.is_staff %}
+                    <a class="btn btn-warning" href="{% url 'employee_dashboard' %} ">Cancel</a>
+                    {% else %}
+                    <a class="btn btn-warning" href="{% url 'customer_dashboard2' user.id %}">Cancel</a>
+                    {% endif %}
+                    <input class="btn btn-danger" type="submit" name="Confirm" value="Confirm">
                 </form>
             </div>
 
