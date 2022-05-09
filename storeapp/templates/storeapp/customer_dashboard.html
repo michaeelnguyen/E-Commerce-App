@@ -68,7 +68,7 @@
 					<th>Date Ordered</th>
 					<th>Status</th>
 					<th>Quantity</th>
-					<th>Custom?</th>
+					<th>Custom Product?</th>
 					{% comment %} <th>Is active?</th> {% endcomment %}
 					<th>Order Details</th>
 					<th>Update Quantity</th>
@@ -83,16 +83,20 @@
 						<td>{{item.order.date_created}}</td>
 						<td><strong>{{item.order.order_Status}}</strong></td>
 						<td>{{item.quantity}}</td>
-						<td>{{item.product.is_custom}}</td>
+						{% if item.product.is_custom %}
+						<td><a class="btn btn-sm btn-primary" href="{% url 'view_history' item.product.id %}">View Production History</a></td>
+						{% else %}
+						<td></td>
+						{% endif %}
 						{% comment %} <td>{{item.order.is_active}}</td> {% endcomment %}
 						<td><a class="btn btn-sm btn-primary" href="{% url 'view_order' item.order.id  %}">View Order</a></td>
-						{% comment %} {% if item.order.order_Status == 'Pending' %} {% endcomment %}
+						{% if item.order.order_Status == 'Pending' %}
 						<td><a class="btn btn-sm btn-warning" href="{% url 'update_orderitem' item.id %}">Update</a></td>
 						<td><a class="btn btn-sm btn-danger" href="{% url 'cancel_order' item.order.id %}">Cancel</a></td>
-						{% comment %} {% else %} {% endcomment %}
+						{% else %}
 						<td></td>
 						<td></td>
-						{% comment %} {% endif %} {% endcomment %}
+						{% endif %}
 
 					</tr>
 					{% endif %}

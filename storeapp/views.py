@@ -15,7 +15,7 @@ from faker import Faker
 
 # Create your views here.
 from .models import *
-from .forms import BillingForm, CustomProductForm, CustomVersionForm, EditOrderForm, InputForm, JobForm, MachineForm, OrderForm, OrderItemForm, ProductForm, CreateUserForm, CustomerForm, ShippingForm, VersionForm, ViewOrderForm, ViewOrderItemForm
+from .forms import BillingForm, CustomProductForm, CustomVersionForm, EditOrderForm, EditVersionForm, InputForm, JobForm, MachineForm, OrderForm, OrderItemForm, ProductForm, CreateUserForm, CustomerForm, ShippingForm, VersionForm, ViewOrderForm, ViewOrderItemForm
 from .filters import OrderFilter, OrderItemFilter
 from .decorators import allowed_users, unauthenticated_user, admin_only
 from .utils import cookieCart, cartData, guestOrder
@@ -257,13 +257,16 @@ def employee_dashboard(request):
     inputs = InputItem.objects.all()
     order_items = OrderItem.objects.all()
 
-    total_customers = customers.count()
+    #total_customers = customers.count()
     total_orders = orders.filter(complete=True).count()
+    total_orders_a = orders.filter(complete=True).exclude(order_Status='Cancelled').count()
+    
+    cancelled = orders.filter(order_Status='Cancelled').count()
     delivered = orders.filter(order_Status='Delivered').count()
     pending = orders.filter(order_Status='Pending').count()
 
     context = {'orders':orders, 'products':products, 'customers':customers, 'jobs':jobs, 'versions':versions, 'machines':machines, 'inputs': inputs,
-    'total_orders':total_orders,'delivered':delivered,
+    'total_orders':total_orders, 'total_orders_a': total_orders_a, 'cancelled': cancelled, 'delivered':delivered,
     'pending':pending, 'order_items':order_items}
 
     return render(request, 'storeapp/employee_dashboard.html', context)
@@ -292,7 +295,7 @@ def customer_dashboard(request, pk):
     order_items = OrderItem.objects.all()
 
     # OFF BY ONE ERROR
-    total_orders = orders.filter(complete=True).count()
+    total_orders = orders.filter(complete=True).exclude(order_Status='Cancelled').count()
     
     delivered = orders.filter(order_Status='Delivered').count()
     pending = orders.filter(order_Status='Pending').count()
@@ -483,7 +486,7 @@ def updateJob(request, pk):
 def createVersion(request):
     form = VersionForm()
     if request.method == 'POST':
-        form = VersionForm(request.POST)
+        form = VersionForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
             return redirect('employee_dashboard')
@@ -499,7 +502,7 @@ def updateVersion(request, pk):
     form = VersionForm(instance=ver)    
 
     if request.method == 'POST':
-        form = VersionForm(request.POST, instance=ver)
+        form = VersionForm(request.POST, request.FILES, instance=ver)
         if form.is_valid():
             form.save()
             return redirect('employee_dashboard')
@@ -587,11 +590,11 @@ def createCustomVersion(request,pk):
 @allowed_users(allowed_roles=['customer'])
 def updateCustomVersion(request, pk):
     ver = Version.objects.get(id=pk)
-    form = CustomVersionForm(instance=ver)    
+    form = EditVersionForm(instance=ver)    
 
     if request.method == 'POST':
-        form = CustomVersionForm(request.POST, instance=ver)
-        if form.is_valid():
+        form = EditVersionForm(request.POST, request.FILES, instance=ver)
+        if form.is_valid():            
             form.save()
             return redirect('products', pk=request.user.customer.pk)
 
@@ -642,7 +645,7 @@ def updateCustomProduct(request, pk):
     return render(request, 'storeapp/update.html', context)
 
 @login_required(login_url='login')
-@allowed_users(allowed_roles=['customer'])
+@allowed_users(allowed_roles=['admin', 'employee', 'customer'])
 def updateOrderItem(request, pk):
     order_item = OrderItem.objects.get(id=pk)
     form = OrderItemForm(instance=order_item)    
@@ -651,7 +654,10 @@ def updateOrderItem(request, pk):
         form = OrderItemForm(request.POST, instance=order_item)
         if form.is_valid():
             form.save()
-            return redirect('employee_dashboard')
+            if request.user.is_staff:
+                return redirect('employee_dashboard')
+            else:
+                return redirect('customer_dashboard2', pk=request.user.customer.pk)
 
     context = {'form': form}
     return render(request, 'storeapp/update.html', context)
@@ -661,17 +667,23 @@ def updateOrderItem(request, pk):
 def viewOrder(request, pk):
     
     order = Order.objects.get(id=pk)
-    #order_item = OrderItem.objects.get(order=order)
     order_items = OrderItem.objects.filter(order=order)
     billing = Billing.objects.get(order=order)
     shipping = Shipping.objects.get(order=order)
 
-
     form = ViewOrderForm(instance=order)
-    #form2 = ViewOrderItemForm(instance=order_item)
     form3 = BillingForm(instance=billing)    
     form4 = ShippingForm(instance=shipping)
 
-    #context = {'form': form, 'form2': form2, 'form3': form3, 'form4': form4, 'order_items': order_items}
     context = {'form': form, 'form3': form3, 'form4': form4, 'order_items': order_items}
     return render(request, 'storeapp/view.html', context)
+
+@login_required(login_url='login')
+@allowed_users(allowed_roles=['customer'])
+def viewProductionHistory(request, pk):
+
+    product = Product.objects.get(id=pk)
+    form = CustomProductForm(instance=product)
+
+    context = {'form':form, 'product': product}
+    return render(request, 'storeapp/productionHistoryForm.html', context)

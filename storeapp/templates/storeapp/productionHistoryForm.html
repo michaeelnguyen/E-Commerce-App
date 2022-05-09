@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>Shop Homepage - Start Bootstrap Template</title>
+
+        {% load static %}
+        <!-- Favicon-->
+        <link rel="icon" type="image/x-icon" href="{% static 'assets/favicon.ico' %}" />
+        <!-- Bootstrap icons-->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
+        <!-- Core theme CSS (includes Bootstrap)-->
+        <link href="{% static 'css/styles.css' %}" rel="stylesheet" />
+    </head>
+    <body>
+
+        {%  include 'storeapp/base.html' %}
+        <!-- Header-->
+        <header class="bg-dark py-5">
+            <div class="container px-4 px-lg-5 my-5">
+                <div class="text-center text-white">
+                    <h1 class="display-4 fw-bolder">Pliable Plastic Production</h1>
+                    <p class="lead fw-normal text-white-50 mb-0">Home Page</p>
+                </div>
+            </div>
+        </header>
+        
+        {% block content %}
+        <!-- Section-->
+        <section class="py-5">
+        <div class="container">
+            <div class="card card-body">
+                <h1 class="display-10 fw-bolder">Production History</h1>
+                <hr>
+                
+            <div class="row-md-2">
+            <form action="" method="GET" enctype="multipart/form-data">
+                
+                <div class="row">
+                    <div class="col">
+                    <h5><strong>Product</strong></h5>
+                    <table class="table table-md">
+                        <tr>
+                            <td>Product Name:</td>
+                            <td>{{product}}</td>
+                        </tr>
+                        <tr>
+                            <td>Product Description:</td>
+                            <td>{{product.product_Description}}</td>
+                        </tr>
+                        <tr>
+                            <td>Height, Width, Depth:</td>
+                            <td>{{product.height}}, {{product.width}}, {{product.depth}}</td>
+                        </tr>
+                        <tr>
+                            <td>Category:</td>
+                            <td>{{product.category_ID}}</td>
+                        </tr>
+                        <tr>
+                            <td>Material:</td>
+                            <td>{{product.material_ID}}</td>
+                        </tr>
+
+                    </table>
+
+                    </div>
+                    <div class="col">
+                    <h5><strong>Version</strong></h5>
+                    <table class="table table-md">
+                        <tr>
+                            <td>Version Number:</td>
+                            <td>{{product.version_ID}}</td>
+                        </tr>
+                        <tr>
+                            <td>Version Date:</td>
+                            <td>{{product.version_ID.product_Version_Date}}</td>
+                        </tr>
+                        <tr>
+                            <td>Version Design File:</td>
+                            <td>{{product.version_ID.filename}}</td>
+                        </tr>
+                        <td>Product Comments:</td>
+                            <td>{{product.version_ID.product_Comments}}</td>
+                    </table>
+
+                    </div>
+                </div>
+                
+                <hr>
+                <div class="col-md-20">
+                    <h5><strong>Job</strong></h5>
+                    <table class="table table-md">
+                        <tr>
+                            <td>Employee:</td>
+                            <td>{{product.job_ID.employee}}</td>
+                        </tr>
+                        <tr>
+                            <td>Start Time - End Time:</td>
+                            <td>{{product.job_ID.start_Time}} - {{product.job_ID.end_Time}}</td>
+                        </tr>
+                        <tr>
+                            <td>Quality Comments</td>
+                            <td>{{product.job_ID.quality_Comments}}</td>
+                        </tr>
+                        <td>Defect Count:</td>
+                            <td>{{product.job_ID.defect_Count}}</td>
+                    </table>
+                </div>
+
+                <hr>
+                <div class="row">
+                    <div class="col">
+                    <h5><strong>Machine</strong></h5>
+                    <table class="table table-md">
+                        <tr>
+                            <td>Machine Number:</td>
+                            <td>{{product.job_ID.machine}}</td>
+                        </tr>
+                    </table>
+                    </div>
+                </div>
+
+                <hr>
+                <div class="row">
+                    <div class="col">
+                    <h5><strong>Inputs</strong></h5>
+                    <table class="table table-md">
+                        <tr>
+                            <th></th>
+                            <th>Input Items</th>
+                            <th>Quantity</th>
+                            <th>Vendor</th>
+                        </tr>
+                        {% for input in product.job_ID.machine.input.all %}
+                            <tr>
+                                <td>{{machine.machine_Number}}</td>
+                                <td>{{input.input_Name}}</td>
+                                <td>{{input.quantity_Per_1000_Units}}</td>
+                                <td>{{input.vendor}}</td>
+                            </tr>
+                        {% endfor %}
+
+
+
+                    </table>
+                    </div>
+                </div>
+
+
+
+            </form>
+            </div>
+        </div>
+
+        </section>
+
+
+        {% endblock %}
+        <!-- Footer-->
+        <footer class="py-5 bg-dark">
+            <div class="container"><p class="m-0 text-center text-white">Copyright &copy; Your Website 2022</p></div>
+        </footer>
+        <!-- Bootstrap core JS-->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+        <!-- Core theme JS-->
+        <script src="js/scripts.js"></script>
+        
+    </body>
+</html>

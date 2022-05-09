@@ -1,0 +1,71 @@
+    {% block content %}
+    <!-- Section-->
+    <section class="py-5">
+    <div class="container">
+        <div class="card card-body">
+            <h1 class="display-10 fw-bolder">Product Details</h1>
+            <hr>
+            
+        <div class="row-md-2">
+        <form action="" method="GET" enctype="multipart/form-data">
+            
+            <div class="row">
+                <div class="col">
+                <h5><strong>Product</strong></h5>
+                <table class="table table-md">
+                    <tr>
+                        <td>Product Name:</td>
+                        <td>{{product}}</td>
+                    </tr>
+                    <tr>
+                        <td>Product Description:</td>
+                        <td>{{product.product_Description}}</td>
+                    </tr>
+                    <tr>
+                        <td>Height, Width, Depth:</td>
+                        <td>{{product.height}}, {{product.width}}, {{product.depth}}</td>
+                    </tr>
+                    <tr>
+                        <td>Category:</td>
+                        <td>{{product.category_ID}}</td>
+                    </tr>
+                    <tr>
+                        <td>Material:</td>
+                        <td>{{product.material_ID}}</td>
+                    </tr>
+
+                </table>
+
+                </div>
+                <div class="col">
+                <h5><strong>Version</strong></h5>
+                <table class="table table-md">
+                    <tr>
+                        <td>Version Number:</td>
+                        <td>{{product.version_ID}}</td>
+                    </tr>
+                    <td>Product Comments:</td>
+                        <td>{{product.version_ID.product_Comments}}</td>
+                </table>
+
+                </div>
+            </div>
+            
+            <hr>
+            <div class="col-md-20">
+                <h5><strong>Job</strong></h5>
+                <table class="table table-md">
+                    <tr>
+                        <td>Quality Comments</td>
+                        <td>{{product.job_ID.quality_Comments}}</td>
+                    </tr>
+                    <td>Defect Count:</td>
+                        <td>{{product.job_ID.defect_Count}}</td>
+                </table>
+            </div>
+        </form>
+        </div>
+    </div>
+
+    </section>
+    {% endblock %}

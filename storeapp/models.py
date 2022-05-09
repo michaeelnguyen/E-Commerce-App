@@ -1,4 +1,5 @@
 from decimal import Decimal
+import os
 from django.conf import settings
 from django.db import models
 from django.utils.text import slugify
@@ -148,7 +149,10 @@ class Version(models.Model):
         if self.customer is None:
             return f'{self.product_Version}'
         else:
-            return f'Custom Design: {self.customer} - v{self.product_Version}'
+            return f'{self.product_Version}'
+    
+    def filename(self):
+        return os.path.basename(self.product_Design_File.path)
 
 
 class InputItem(models.Model):
@@ -166,9 +170,22 @@ class InputItem(models.Model):
     def __str__(self):
         return f'{self.input_Name} / QTY: {self.quantity_Per_1000_Units}'
 
-class Job(models.Model):
+class Machine(models.Model):
+    #job = models.ForeignKey(Job, null=True, on_delete=models.SET_NULL, blank=True)
+    machine_Number = models.PositiveIntegerField(null=True)
+    input = models.ManyToManyField(InputItem, related_name='inputs')
+    
+    date_created = models.DateTimeField(auto_now_add=True, null=True)
+    is_active = models.BooleanField(default=True)
 
-    #machine_ID = models.ForeignKey(Machine, null=True, on_delete=models.SET_NULL, blank=True)
+    class Meta:
+        ordering = ['machine_Number']
+
+    def __str__(self):
+        return f' Machine #{self.machine_Number}'
+
+class Job(models.Model):
+    machine_ID = models.ForeignKey(Machine, null=True, on_delete=models.SET_NULL, blank=True)
     employee = models.ForeignKey(Employee, null=True, on_delete=models.SET_NULL)
     start_Time = models.DateTimeField(auto_now_add=False, null=True)
     end_Time = models.DateTimeField(auto_now_add=False, null=True, blank=True)
@@ -185,22 +202,6 @@ class Job(models.Model):
         if self.end_Time == None:
             return f'{self.employee} - [START TIME: {self.start_Time}] [END TIME: IN PROGRESS...]'
         return f'{self.employee} - [START TIME: {self.start_Time.strftime("%m/%d/%Y, %H:%M")}] [END TIME: {self.end_Time.strftime("%m/%d/%Y, %H:%M")}]'
-
-
-class Machine(models.Model):
-    job = models.ForeignKey(Job, null=True, on_delete=models.SET_NULL, blank=True)
-    machine_Number = models.PositiveIntegerField(null=True)
-    input = models.ManyToManyField(InputItem, related_name='inputs')
-    
-    date_created = models.DateTimeField(auto_now_add=True, null=True)
-    is_active = models.BooleanField(default=True)
-
-    class Meta:
-        ordering = ['machine_Number']
-
-    def __str__(self):
-        return f' Machine #{self.machine_Number}'
-
 
 class Category(models.Model):
     category_Name = models.CharField(max_length=255, null=True)

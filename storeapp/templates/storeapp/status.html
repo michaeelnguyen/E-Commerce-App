@@ -22,6 +22,35 @@
 		</div>
 	</div>
 
+	{% if request.user.is_staff %}
+	<div class="col">
+		<div class="col-md">
+			<div class="card text-center mb-3" id="total-orders">
+			  	<div class="card-header">
+			  		<h5 class="card-title">Total Orders (Active)</h5>
+			  	</div>
+			  	<div class="card-body">
+			    	<h3 class="card-title">{{total_orders_a}}</h3>
+			  	</div>
+			</div>
+		</div>
+	</div>
+
+<div class="row">
+	<div class="col">
+		<div class="col-md">
+			<div class="card text-center mb-3" id="total-orders">
+			  	<div class="card-header">
+			  		<h5 class="card-title">Orders Cancelled</h5>
+			  	</div>
+			  	<div class="card-body">
+			    	<h3 class="card-title">{{cancelled}}</h3>
+			  	</div>
+			</div>
+		</div>
+	</div>
+	{% endif %}
+
 	<div class="col">
 		<div class="col-md">
 			<div class="card text-center mb-3" id="orders-pending">

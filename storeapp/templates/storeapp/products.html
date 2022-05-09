@@ -42,7 +42,10 @@
 									<th>Product</th>
 									<th>Category</th>
 									<th>Material</th>
+                                    <th>Version</th>
                                     <th>File</th>
+                                    <th></th>
+                                    <th></th>
                                     <th></th>
 								</tr>
 		
@@ -53,7 +56,8 @@
 										<td>{{p.product_Name}}</td>
 										<td>{{p.category_ID}}</td>
 										<td>{{p.material_ID}}</td>
-                                        <td>{{p.version_ID.product_Design_File}}</td>
+                                        <td>{{p.version_ID}}</td>
+                                        <td>{{p.version_ID.filename}}</td>
                                         <td><a class="btn btn-sm btn-primary" href="{% url 'update_custom_product' p.id %}">Update Product</a></td>
                                         <td><a class="btn btn-sm btn-primary" href="{% url 'update_custom_version' v.id %}">Update Design Version</a></td>
                                         <td><a data-product="{{p.id}}" data-action="add" class="btn btn-outline-dark mt-auto add-btn update-cart">Add to Cart</a></td>

@@ -59,6 +59,7 @@ class CustomProductForm(ModelForm):
     category_ID = forms.ModelChoiceField(queryset=Category.objects.all(), label="Category")
     material_ID = forms.ModelChoiceField(queryset=Material.objects.all(), label="Material Type")
     version_ID = forms.ModelChoiceField(queryset=Version.objects.all(), label="Version")
+    
     class Meta:
         model = Product
         fields = '__all__'
@@ -78,11 +79,19 @@ class VersionForm(ModelForm):
 
 class CustomVersionForm(ModelForm):
     product_Version_Date = forms.DateTimeField(widget=DateTimeInput, label='Version Date')
-
+    
     class Meta:
         model = Version
         fields = ['customer','product_Version', 'product_Version_Date' , 'product_Design_File']
 
+class EditVersionForm(ModelForm):
+    customer = forms.ModelChoiceField(queryset=Customer.objects.all(), disabled=True)
+    product_Version_Date = forms.DateTimeField(widget=DateTimeInput, label='Version Date')
+
+    class Meta:
+        model = Version
+        fields = ['customer','product_Version', 'product_Version_Date' , 'product_Design_File']
+        
 class MachineForm(ModelForm):
     class Meta:
         model = Machine

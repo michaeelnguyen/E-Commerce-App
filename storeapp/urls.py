@@ -64,8 +64,9 @@ urlpatterns = [
     path('create_custom_product/<str:pk>/', storeapp_views.createCustomProduct, name="create_custom_product"),
     path('update_custom_product/<str:pk>/', storeapp_views.updateCustomProduct, name="update_custom_product"),
 
-    path('update_orderitem/<str:pk>', storeapp_views.updateOrderItem, name='update_orderitem'),
 
+    path('update_orderitem/<str:pk>', storeapp_views.updateOrderItem, name='update_orderitem'),
+    path('production_history/<str:pk>', storeapp_views.viewProductionHistory, name='view_history'),
 
 
     path('reset_password/',

@@ -10,7 +10,7 @@ STATUS = (
     ('Shipped', 'Shipped'),
     ('Out for Delivery', 'Out for Delivery'),
     ('Delivered', 'Delivered'),
-    ('Canceled', 'Canceled'),
+    ('Cancelled', 'Cancelled'),
 )
 
 
