@@ -187,7 +187,7 @@ class Machine(models.Model):
 class Job(models.Model):
     machine_ID = models.ForeignKey(Machine, null=True, on_delete=models.SET_NULL, blank=True)
     employee = models.ForeignKey(Employee, null=True, on_delete=models.SET_NULL)
-    start_Time = models.DateTimeField(auto_now_add=False, null=True)
+    start_Time = models.DateTimeField(auto_now_add=False, null=True, blank=True)
     end_Time = models.DateTimeField(auto_now_add=False, null=True, blank=True)
     quality_Comments = models.TextField(null=True, blank=True)
     defect_Count = models.PositiveIntegerField(null=True, blank=True)

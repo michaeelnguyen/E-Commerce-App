@@ -15,7 +15,7 @@ from faker import Faker
 
 # Create your views here.
 from .models import *
-from .forms import BillingForm, CustomProductForm, CustomVersionForm, EditOrderForm, EditVersionForm, InputForm, JobForm, MachineForm, OrderForm, OrderItemForm, ProductForm, CreateUserForm, CustomerForm, ShippingForm, VersionForm, ViewOrderForm, ViewOrderItemForm
+from .forms import BillingForm, CustomProductForm, CustomVersionForm, EditOrderAdminForm, EditOrderForm, EditVersionForm, InputForm, JobForm, MachineForm, OrderForm, OrderItemForm, ProductForm, CreateUserForm, CustomerForm, ShippingForm, VersionForm, ViewOrderForm, ViewOrderItemForm
 from .filters import OrderFilter, OrderItemFilter
 from .decorators import allowed_users, unauthenticated_user, admin_only
 from .utils import cookieCart, cartData, guestOrder
@@ -372,10 +372,17 @@ def createOrder(request, pk):
 def updateOrder(request, pk):
 
     order = Order.objects.get(id=pk)
-    form = EditOrderForm(instance=order)    
+
+    if request.user.is_staff:
+        form = EditOrderAdminForm(instance=order)
+    else:
+        form = EditOrderForm(instance=order)    
 
     if request.method == 'POST':
-        form = EditOrderForm(request.POST, instance=order)
+        if request.user.is_staff:
+            form = EditOrderAdminForm(request.POST, instance=order)
+        else:
+            form = EditOrderForm(request.POST, instance=order)
         if form.is_valid():
             form.save()
             if request.user.is_staff:
@@ -410,7 +417,10 @@ def cancelOrder(request, pk):
             item.order=order
             item.save(update_fields=['order'], force_update=True)
 
-        redirect('customer_dashboard2', user.id)
+        if request.user.is_staff:
+            return redirect('employee_dashboard')
+        else:
+            return redirect('customer_dashboard2', user.id)
 
     context = {'order': order, 'user': user}
 

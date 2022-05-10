@@ -1,3 +1,4 @@
+from mimetypes import init
 from django import forms
 from django.forms import ModelForm
 from django.contrib.auth.forms import UserCreationForm
@@ -17,7 +18,6 @@ class DateTimeInput(forms.DateTimeInput):
     input_type = 'datetime'
 
 
-
 class OrderForm(ModelForm):
     class Meta:
         model = Order
@@ -33,6 +33,16 @@ class EditOrderForm(ModelForm):
         model = Order
         fields = '__all__'
         exclude = ['complete', 'total']
+
+class EditOrderAdminForm(ModelForm):
+    customer = forms.ModelChoiceField(queryset=Customer.objects.all(), disabled=True)
+    confirmation_Number = forms.CharField(disabled=True)
+    order_Status = forms.ChoiceField(choices=STATUS)
+
+    class Meta:
+        model = Order
+        fields = '__all__'
+        exclude = ['complete']
 
 class CreateUserForm(UserCreationForm):
     class Meta:
@@ -67,7 +77,7 @@ class CustomProductForm(ModelForm):
 
 class JobForm(ModelForm):
     start_Time = forms.DateTimeField(widget=DateTimeInput)
-    end_Time = forms.DateTimeField(widget=DateTimeInput)
+    end_Time = forms.DateTimeField(required=False, widget=DateTimeInput)
     class Meta:
         model = Job
         fields = '__all__'
@@ -135,12 +145,12 @@ class BillingForm(ModelForm):
     billing_State = forms.CharField(disabled=True, label='State')
     billing_Zip = forms.CharField(disabled=True, label='Zip Code')
 
-    date_Billed = forms.DateTimeField(widget=DateTimeInput, disabled=True, label='Date Billed')
+    #date_Billed = forms.DateTimeField(widget=DateTimeInput, disabled=True, label='Date Billed')
 
     class Meta: 
         model = Billing
         fields = '__all__'
-        exclude = ['customer', 'order', 'is_active']
+        exclude = ['customer', 'order', 'is_active', 'date_Billed']
 
 class ShippingForm(ModelForm):
     shipping_Address = forms.CharField(disabled=True, label='Shipping Address')
@@ -152,10 +162,10 @@ class ShippingForm(ModelForm):
     #shipment_Quantity = forms.IntegerField(disabled=True, label='Shipping Quantity')
     shipment_Weight = forms.DecimalField(disabled=True, label='Shipping Weight')
 
-    date_Shipped = forms.DateTimeField(widget=DateTimeInput, disabled=True, label="Date Shipped")
+    #date_Shipped = forms.DateTimeField(widget=DateTimeInput, disabled=True, label="Date Shipped")
 
-    expediter_ID = forms.ModelChoiceField(queryset=Expediter.objects.all(), disabled=True, label='Expediter')
+    expediter_ID = forms.ModelChoiceField(queryset=Expediter.objects.all(), disabled=True,label='Expediter', initial={'Amazon'})
     class Meta:
         model = Shipping
         fields = '__all__'
-        exclude = ['customer', 'order', 'is_active', 'shipment_Cost', 'shipment_Quantity']
+        exclude = ['customer', 'order', 'is_active', 'shipment_Cost', 'shipment_Quantity', 'date_Shipped']

@@ -23,7 +23,6 @@
             <div class="container px-4 px-lg-5 my-5">
                 <div class="text-center text-white">
                     <h1 class="display-4 fw-bolder">Pliable Plastic Production</h1>
-                    <p class="lead fw-normal text-white-50 mb-0">Home Page</p>
                 </div>
             </div>
         </header>
@@ -117,7 +116,7 @@
                     <table class="table table-md">
                         <tr>
                             <td>Machine Number:</td>
-                            <td>{{product.job_ID.machine}}</td>
+                            <td>{{product.job_ID.machine_ID}}</td>
                         </tr>
                     </table>
                     </div>
@@ -134,9 +133,9 @@
                             <th>Quantity</th>
                             <th>Vendor</th>
                         </tr>
-                        {% for input in product.job_ID.machine.input.all %}
+                        {% for input in product.job_ID.machine_ID.input.all %}
                             <tr>
-                                <td>{{machine.machine_Number}}</td>
+                                <td>{{machine.machine_ID_Number}}</td>
                                 <td>{{input.input_Name}}</td>
                                 <td>{{input.quantity_Per_1000_Units}}</td>
                                 <td>{{input.vendor}}</td>

@@ -53,11 +53,13 @@
 			<table class="table table-sm">
 				<tr>
 					<th>Product</th>
+					<th>Version</th>
 					<th>Confirmation #</th>
 					<th>Date Ordered</th>
 					<th>Status</th>
 					<th>Quantity</th>
 					<th>Custom?</th>
+					<th></th>
 					<th></th>
 				</tr>
 
@@ -65,6 +67,7 @@
 					{% if item.order.complete %}
 					<tr>
 						<td>{{item}}</td>
+						<td>{{item.product.version_ID}}</td>
 						<td>{{item.order.confirmation_Number}}</td>
 						<td>{{item.order.date_created}}</td>
 						<td><strong>{{item.order.order_Status}}</strong></td>
@@ -105,6 +108,7 @@
 					<th>Version</th>
 					<th>Stock</th>
 					<th>Price</th>
+					<th>Custom</th>
 					
 
 				</tr>
@@ -117,7 +121,7 @@
 						
 						<td>
 							<div class="d-flex justify-content-center small mb-2">
-								{% if product.product_Stock %}
+								{% if product.product_Stock and not product.is_custom %}
 								<div class="text-success">In Stock</div>
 								{% else %}
 								<div class="text-danger">Out of Stock</div>
@@ -125,6 +129,11 @@
 							</div>
 						</td>
 						<td>{{product.product_Price}}</td>
+						{% if product.is_custom %}
+							<td><div class="text-success">Yes</div></td>
+						{% else %}
+							<td></td>
+						{% endif %}
 						<td><a class="btn btn-sm btn-primary" href="{% url 'update_product' product.id %}">Update</a></td>
 					</tr>
 				{% endfor %}

@@ -85,7 +85,7 @@ def guestOrder(request, data):
         complete=True,
         confirmation_Number = transaction_id,
         order_Status = 'Pending',
-        total = order.get_cart_total,
+        total = order['get_cart_total'],
         
     )
 
